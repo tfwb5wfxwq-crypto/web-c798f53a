@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0E0F11">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Muscu">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<title>Muscu · Ludo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0F11; --s1:#16181B; --s2:#1E2125; --s3:#272A2F;
+  --hair:rgba(242,240,236,.08); --hair2:rgba(242,240,236,.14);
+  --t1:#F2F0EC; --t2:#B3AFA7; --t3:#87837C;
+  --gant:#E8493C; --gant-ink:#FF6B5E; --ok:#7FCB8F;
+  --r-ctl:10px; --r-card:16px;
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{font-family:'Barlow',system-ui,sans-serif;background:var(--bg);color:var(--t1);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;min-height:100dvh;overscroll-behavior-y:none}
+::selection{background:rgba(232,73,60,.35)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gant-ink);outline-offset:2px;border-radius:8px}
+.num{font-variant-numeric:tabular-nums}
+.cond{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em}
+svg.ic{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.wrap{max-width:560px;margin:0 auto;padding:calc(var(--safe-t) + 16px) 16px calc(var(--safe-b) + 112px)}
+
+/* En-tête */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:20px}
+.top h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:40px;line-height:1;letter-spacing:-.01em}
+.top p{color:var(--t2);font-size:15px;margin-top:4px}
+.iconbtn{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;color:var(--t2);background:var(--s1);border:1px solid var(--hair)}
+.iconbtn:active{background:var(--s2)}
+
+/* Semaine */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:24px}
+.day{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0 8px;border-radius:12px;color:var(--t3);border:1px solid transparent}
+.day b{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em}
+.day span{font-size:11px;line-height:1.2;text-align:center;min-height:26px;display:flex;align-items:center}
+.day i{width:6px;height:6px;border-radius:50%;background:var(--s3)}
+.day.done i{background:var(--ok)}
+.day.today{color:var(--t1)}
+.day.sel{background:var(--s1);border-color:var(--hair2);color:var(--t1)}
+.day.today b{color:var(--gant-ink)}
+
+/* Blocs */
+.block{background:var(--s1);border:1px solid var(--hair);border-radius:var(--r-card);margin-bottom:12px;overflow:hidden}
+.pompes{display:flex;align-items:center;gap:14px;padding:16px}
+.pompes .txt{flex:1;min-width:0}
+.pompes .txt strong{display:block;font-weight:600}
+.pompes .txt small{color:var(--t2);font-size:14px}
+.check{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--hair2);display:grid;place-items:center;color:transparent;flex:none;transition:background-color .2s,border-color .2s,color .2s}
+.check.on{background:var(--ok);border-color:var(--ok);color:#0E0F11}
+
+.sess-head{padding:20px 16px 12px}
+.sess-head h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px;line-height:1.05}
+.sess-head p{color:var(--t2);font-size:15px;margin-top:4px}
+.ex{display:flex;align-items:center;gap:14px;padding:12px 16px;width:100%;text-align:left;border-top:1px solid var(--hair)}
+.ex:active{background:var(--s2)}
+.ex .thumb{width:64px;height:48px;border-radius:8px;object-fit:cover;background:var(--s3);flex:none;filter:grayscale(1) contrast(1.05) brightness(.92)}
+.ex .txt{flex:1;min-width:0}
+.ex .txt strong{display:block;font-weight:600;line-height:1.25}
+.ex .txt small{color:var(--t2);font-size:14px}
+.ex .state{color:var(--t3)}
+.ex.done .state{color:var(--ok)}
+.ex.done .txt strong{color:var(--t2)}
+
+.rest{padding:28px 20px;text-align:center}
+.rest h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px}
+.rest p{color:var(--t2);margin-top:6px}
+
+.note{color:var(--t3);font-size:13px;line-height:1.5;padding:4px 4px 0}
+.note a{color:var(--t2);text-underline-offset:3px}
+
+/* Fiche exercice */
+.sheet{position:fixed;inset:0;background:var(--bg);z-index:20;overflow-y:auto;transform:translateY(100%);transition:transform .32s cubic-bezier(.22,1,.36,1);visibility:hidden}
+.sheet.open{transform:none;visibility:visible}
+.sheet .wrap{padding-top:calc(var(--safe-t) + 12px)}
+.sheet-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.anim{position:relative;aspect-ratio:3/2;border-radius:var(--r-card);overflow:hidden;background:#F4F2EE;margin-bottom:16px}
+.anim img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.anim img+img{animation:flip 2.4s ease-in-out infinite}
+@keyframes flip{0%,38%{opacity:0}50%,88%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.anim img+img{animation:none;opacity:0}}
+.ex-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;line-height:1.05}
+.ex-meta{color:var(--t2);margin:6px 0 16px}
+.cues{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.cues li{display:flex;gap:10px;color:var(--t2);font-size:15px}
+.cues li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gant);margin-top:9px;flex:none}
+.last{font-size:14px;color:var(--t2);background:var(--s1);border:1px solid var(--hair);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.last b{color:var(--t1);font-weight:600}
+.last .up{color:var(--ok);font-weight:600}
+
+.sets{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.set{display:grid;grid-template-columns:28px 1fr 1fr 48px;gap:8px;align-items:center}
+.set .n{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:18px;color:var(--t3);text-align:center}
+.field{position:relative}
+.field input{width:100%;height:48px;border-radius:var(--r-ctl);background:var(--s1);border:1px solid var(--hair2);padding:0 40px 0 14px;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;-moz-appearance:textfield;caret-color:var(--gant-ink)}
+.field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.field input:focus{border-color:var(--t2);outline:none}
+.field input::placeholder{color:var(--t3);font-weight:500}
+.field em{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-style:normal;color:var(--t3);font-size:14px;pointer-events:none}
+.set .check{width:48px;height:48px}
+.set.on .field input{color:var(--t2)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:52px;border-radius:14px;font-weight:600;font-size:16px}
+.btn-main{background:var(--t1);color:#0E0F11}
+.btn-main:active{background:#D9D6D0}
+.btn-ghost{background:var(--s1);border:1px solid var(--hair2);color:var(--t1)}
+.btn-ghost:active{background:var(--s2)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* Minuteur de repos : la cloche */
+.bell{position:fixed;left:12px;right:12px;bottom:calc(var(--safe-b) + 12px);max-width:536px;margin:0 auto;z-index:30;background:var(--s2);border:1px solid var(--hair2);border-radius:18px;padding:12px 12px 12px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);transform:translateY(calc(100% + 24px));transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.bell.show{transform:none}
+.bell .ring{width:44px;height:44px;flex:none}
+.bell .ring circle{fill:none;stroke-width:4}
+.bell .ring .bg{stroke:var(--s3)}
+.bell .ring .fg{stroke:var(--gant);stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 1s linear}
+.bell .txt{flex:1}
+.bell .txt strong{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1}
+.bell .txt small{display:block;color:var(--t2);font-size:13px}
+.bell.ding{background:var(--gant)}
+.bell.ding .txt small{color:#fff}
+.bell.ding .ring .bg{stroke:rgba(255,255,255,.35)}
+.bell.ding .ring .fg{stroke:#fff}
+.bell button{height:44px;padding:0 14px;border-radius:12px;background:var(--s3);font-weight:600;font-size:15px}
+.bell.ding button{background:rgba(0,0,0,.2)}
+
+/* Historique */
+.hist h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:28px;margin:8px 0 12px}
+.hrow{padding:14px 16px;border-top:1px solid var(--hair)}
+.hrow:first-child{border-top:0}
+.hrow strong{display:block;font-weight:600}
+.hrow small{color:var(--t2);font-size:14px}
+.empty{padding:20px 16px;color:var(--t2)}
+</style>
+</head>
+<body>
+<main class="wrap" id="app"></main>
+
+<section class="sheet" id="sheet" aria-modal="true" role="dialog" aria-label="Exercice"><div class="wrap" id="sheetBody"></div></section>
+
+<div class="bell" id="bell" role="status" aria-live="polite">
+  <svg class="ring" viewBox="0 0 44 44" aria-hidden="true"><circle class="bg" cx="22" cy="22" r="18"/><circle class="fg" id="ringFg" cx="22" cy="22" r="18" stroke-dasharray="113.1" stroke-dashoffset="0"/></svg>
+  <div class="txt"><strong class="num" id="bellTime">1:30</strong><small id="bellLabel">Repos</small></div>
+  <button type="button" id="bellBtn">Passer</button>
+</div>
+
+<script>
+// ===== Programme (boxe lun, mar, mer, ven · 100 pompes/jour pour pectoraux et triceps) =====
+const EX = {
+  tractions:{nom:'Tractions prise large',img:'Pullups',series:4,reps:'max',repos:120,muscles:'Grand dorsal, haut du dos',
+    cues:['Mains un peu plus larges que les épaules, paumes vers l’avant','Tire les coudes vers les hanches, poitrine vers la barre','Descends bras tendus à chaque fois, sans balancer']},
+  rowing1:{nom:'Rowing haltère un bras',img:'One-Arm_Dumbbell_Row',series:3,reps:'10',repos:75,muscles:'Grand dorsal, rhomboïdes',
+    cues:['Genou et main sur le banc, dos plat','Tire l’haltère vers la hanche, pas vers l’épaule','10 par bras, contrôle la descente']},
+  tirage:{nom:'Tirage vertical prise large',img:'Wide-Grip_Lat_Pulldown',series:3,reps:'10',repos:75,muscles:'Grand dorsal',
+    cues:['À la salle, ou 3 séries de tractions en plus à la maison','Barre vers le haut de la poitrine, buste légèrement en arrière','Remonte lentement, épaules basses']},
+  curl:{nom:'Curl haltères',img:'Dumbbell_Bicep_Curl',series:3,reps:'10-12',repos:60,muscles:'Biceps',
+    cues:['Coudes collés au corps, ils ne bougent pas','Tourne le poignet paume vers le haut en montant','Descends en 2 secondes, pas d’élan du dos']},
+  marteau:{nom:'Curl marteau',img:'Hammer_Curls',series:3,reps:'10',repos:60,muscles:'Biceps, avant-bras',
+    cues:['Paumes face à face tout le long','Monte jusqu’à l’épaule, sans lever le coude','Utile en boxe : solidifie les avant-bras']},
+  developpe:{nom:'Développé haltères assis',img:'Seated_Dumbbell_Press',series:4,reps:'8-10',repos:90,muscles:'Épaules (avant et côté)',
+    cues:['Dossier droit, dos bien calé','Pousse vers le haut sans claquer les haltères','Descends jusqu’aux oreilles, coudes un peu devant']},
+  laterales:{nom:'Élévations latérales',img:'Side_Lateral_Raise',series:3,reps:'12-15',repos:60,muscles:'Épaules (côté)',
+    cues:['Léger, c’est l’exercice où on triche le plus','Monte jusqu’à l’horizontale, coudes un peu fléchis','Pense « écarter », pas « soulever »']},
+  oiseau:{nom:'Oiseau (arrière d’épaule)',img:'Reverse_Flyes',series:3,reps:'15',repos:60,muscles:'Arrière d’épaule, haut du dos',
+    cues:['Penché en avant ou à plat ventre sur un banc incliné','Écarte les bras en serrant les omoplates','Équilibre les épaules travaillées par les pompes et la boxe']},
+  rowing2:{nom:'Rowing buste penché',img:'Bent_Over_Two-Dumbbell_Row',series:3,reps:'10',repos:75,muscles:'Milieu du dos',
+    cues:['Buste penché à 45°, dos plat, genoux fléchis','Tire les deux haltères vers le nombril','Serre les omoplates une seconde en haut']},
+  facepull:{nom:'Face pull',img:'Face_Pull',series:3,reps:'15',repos:60,muscles:'Arrière d’épaule, coiffe',
+    cues:['Poulie haute à la salle, ou élastique accroché en hauteur','Tire vers le visage en écartant les mains','Coudes hauts, finis pouces vers l’arrière']},
+  chinup:{nom:'Tractions supination',img:'Chin-Up',series:3,reps:'max',repos:90,muscles:'Biceps, grand dorsal',
+    cues:['Paumes vers toi, mains à largeur d’épaules','Menton au-dessus de la barre','Descente lente : c’est là que les biceps travaillent']},
+  curlincline:{nom:'Curl incliné',img:'Incline_Dumbbell_Curl',series:3,reps:'10',repos:60,muscles:'Biceps (étirement)',
+    cues:['Banc incliné à 45°, bras qui pendent','Monte sans avancer les coudes','Plus léger que le curl debout, c’est normal']},
+  shrugs:{nom:'Haussements d’épaules',img:'Barbell_Shrug',series:3,reps:'12',repos:60,muscles:'Trapèzes',
+    cues:['Barre ou deux haltères lourds, bras tendus','Monte les épaules vers les oreilles, tiens 1 seconde','Ne roule pas les épaules, juste haut et bas']},
+};
+const SEANCES = {
+  A:{titre:'Dos et biceps',sous:'5 exercices · 45 min environ',liste:['tractions','rowing1','tirage','curl','marteau']},
+  B:{titre:'Épaules et dos',sous:'5 exercices · 45 min environ',liste:['developpe','laterales','oiseau','rowing2','facepull']},
+  C:{titre:'Bras et trapèzes',sous:'Bonus si tu as la forme · 25 min',liste:['chinup','curlincline','shrugs']},
+};
+// 0 = lundi … 6 = dimanche
+const SEMAINE = [
+  {court:'Boxe',type:'boxe'},{court:'Boxe',type:'boxe'},{court:'Boxe',type:'boxe'},
+  {court:'Dos bras',type:'A'},{court:'Boxe',type:'boxe'},{court:'Épaules',type:'B'},{court:'Bonus',type:'C'},
+];
+const JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const J3 = ['LUN','MAR','MER','JEU','VEN','SAM','DIM'];
+
+// ===== Données (gardées sur ce téléphone) =====
+const CLE = 'muscu-ludo-v1';
+let D; try { D = JSON.parse(localStorage.getItem(CLE)) || {}; } catch (e) { D = {}; }
+D.jours = D.jours || {};
+const save = () => { try { localStorage.setItem(CLE, JSON.stringify(D)); } catch (e) {} };
+const iso = d => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 10); };
+const jourIdx = d => (new Date(d).getDay() + 6) % 7;
+const lundi = d => { const x = new Date(d); x.setHours(12, 0, 0, 0); x.setDate(x.getDate() - jourIdx(x)); return x; };
+const today = new Date(); today.setHours(12, 0, 0, 0);
+let sel = iso(today);
+const jour = k => (D.jours[k] = D.jours[k] || { pompes: false, ex: {} });
+
+const I = {
+  check:'<svg class="ic" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  chev:'<svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
+  down:'<svg class="ic" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>',
+  hist:'<svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>',
+  back:'<svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',
+};
+const img = (id, n) => `img/${id}-${n}.webp`;
+const fmtKg = v => (v === '' || v == null) ? '' : String(v).replace('.', ',');
+
+// Dernière séance d'un exercice avant une date (pour pré-remplir et proposer la progression)
+function dernier(exId, avant) {
+  const ks = Object.keys(D.jours).filter(k => k < avant && D.jours[k].ex[exId] && D.jours[k].ex[exId].some(s => s.ok)).sort();
+  if (!ks.length) return null;
+  const k = ks[ks.length - 1];
+  return { date: k, sets: D.jours[k].ex[exId] };
+}
+function conseil(ex, d) {
+  if (!d) return '';
+  const faits = d.sets.filter(s => s.ok);
+  const haut = parseInt(String(ex.reps).split('-').pop(), 10);
+  if (ex.reps === 'max' || !haut) return '';
+  const tout = faits.length >= ex.series && faits.every(s => Number(s.reps) >= haut);
+  return tout ? 'Toutes les séries faites en haut de la fourchette : ajoute 1 à 2 kg' : '';
+}
+const resume = sets => sets.filter(s => s.ok).map(s => (s.kg ? fmtKg(s.kg) + ' kg × ' : '') + (s.reps || '?')).join(' · ');
+const dateFr = k => new Date(k + 'T12:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+// ===== Écran principal =====
+function render(vue) {
+  const app = document.getElementById('app');
+  if (vue === 'hist') return renderHist(app);
+  const d0 = lundi(today), selD = new Date(sel + 'T12:00'), idx = jourIdx(selD), prog = SEMAINE[idx];
+  let h = `<header class="top"><div><h1>${JOURS[idx]}</h1><p>${sel === iso(today) ? 'Aujourd’hui' : dateFr(sel)}</p></div>
+    <button class="iconbtn" type="button" onclick="render('hist')" aria-label="Historique">${I.hist}</button></header>`;
+  h += '<nav class="week" aria-label="Semaine">';
+  for (let i = 0; i < 7; i++) {
+    const x = new Date(d0); x.setDate(d0.getDate() + i); const k = iso(x), j = D.jours[k];
+    const fait = j && (SEMAINE[i].type === 'boxe' ? j.pompes : Object.values(j.ex).some(s => s.some(z => z.ok)));
+    h += `<button type="button" class="day${k === iso(today) ? ' today' : ''}${k === sel ? ' sel' : ''}${fait ? ' done' : ''}" onclick="sel='${k}';render()" aria-label="${JOURS[i]}, ${SEMAINE[i].court}">
+      <b>${J3[i]}</b><span>${SEMAINE[i].court}</span><i></i></button>`;
+  }
+  h += '</nav>';
+  const j = jour(sel);
+  h += `<div class="block pompes"><div class="txt"><strong>100 pompes</strong><small>Pectoraux et triceps, tous les jours</small></div>
+    <button type="button" class="check${j.pompes ? ' on' : ''}" onclick="togglePompes()" aria-pressed="${j.pompes}" aria-label="100 pompes faites">${I.check}</button></div>`;
+  if (prog.type === 'boxe') {
+    h += `<div class="block rest"><h2>Boxe</h2><p>Pas de muscu aujourd’hui : la boxe travaille déjà les épaules et le cardio.</p></div>`;
+  } else {
+    const s = SEANCES[prog.type];
+    h += `<div class="block"><div class="sess-head"><h2>${s.titre}</h2><p>${s.sous}</p></div>`;
+    s.liste.forEach(id => {
+      const e = EX[id], sets = j.ex[id] || [], n = sets.filter(z => z.ok).length, ok = n >= e.series;
+      h += `<button type="button" class="ex${ok ? ' done' : ''}" onclick="ouvrir('${id}')">
+        <img class="thumb" src="${img(e.img, 0)}" alt="" loading="lazy">
+        <div class="txt"><strong>${e.nom}</strong><small class="num">${e.series} × ${e.reps}${n ? ' · ' + n + '/' + e.series + ' faites' : ''}</small></div>
+        <span class="state">${ok ? I.check : I.chev}</span></button>`;
+    });
+    h += '</div>';
+  }
+  h += `<p class="note">Tes séances restent sur ce téléphone. Pense à <a href="#" onclick="exporter();return false">sauvegarder</a> de temps en temps.</p>`;
+  app.innerHTML = h;
+}
+function togglePompes() { const j = jour(sel); j.pompes = !j.pompes; save(); if (navigator.vibrate) navigator.vibrate(15); render(); }
+
+// ===== Fiche exercice =====
+let cur = null;
+function ouvrir(id) {
+  cur = id; const e = EX[id], j = jour(sel);
+  const prev = dernier(id, sel);
+  if (!j.ex[id]) j.ex[id] = Array.from({ length: e.series }, (_, i) => ({ kg: prev && prev.sets[i] ? prev.sets[i].kg : '', reps: prev && prev.sets[i] ? prev.sets[i].reps : '', ok: false }));
+  const c = conseil(e, prev);
+  let h = `<div class="sheet-top"><button class="iconbtn" type="button" onclick="fermer()" aria-label="Retour">${I.down}</button></div>
+    <div class="anim"><img src="${img(e.img, 0)}" alt="${e.nom}, position de départ"><img src="${img(e.img, 1)}" alt="${e.nom}, position d’arrivée"></div>
+    <h2 class="ex-title">${e.nom}</h2><p class="ex-meta num">${e.series} séries de ${e.reps === 'max' ? 'max' : e.reps} · repos ${fmtRepos(e.repos)} · ${e.muscles}</p>
+    <ul class="cues">${e.cues.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  if (prev) h += `<p class="last">La dernière fois (${new Date(prev.date + 'T12:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}) : <b class="num">${resume(prev.sets)}</b>${c ? `<br><span class="up">${c}</span>` : ''}</p>`;
+  h += '<div class="sets" id="sets"></div>';
+  h += `<div class="row"><button class="btn btn-ghost" type="button" onclick="ajoutSerie()">Ajouter une série</button><button class="btn btn-main" type="button" onclick="fermer()">Terminer</button></div>`;
+  document.getElementById('sheetBody').innerHTML = h;
+  renderSets();
+  const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
+}
+function renderSets() {
+  const e = EX[cur], sets = jour(sel).ex[cur];
+  document.getElementById('sets').innerHTML = sets.map((s, i) => `
+    <div class="set${s.ok ? ' on' : ''}">
+      <span class="n num">${i + 1}</span>
+      <label class="field"><input type="number" inputmode="decimal" step="0.5" min="0" placeholder="—" value="${s.kg}" aria-label="Série ${i + 1}, poids" onchange="maj(${i},'kg',this.value)"><em>kg</em></label>
+      <label class="field"><input type="number" inputmode="numeric" min="0" placeholder="${e.reps === 'max' ? 'max' : e.reps.split('-')[0]}" value="${s.reps}" aria-label="Série ${i + 1}, répétitions" onchange="maj(${i},'reps',this.value)"><em>rép.</em></label>
+      <button type="button" class="check${s.ok ? ' on' : ''}" onclick="valider(${i})" aria-pressed="${s.ok}" aria-label="Série ${i + 1} faite">${I.check}</button>
+    </div>`).join('');
+}
+function maj(i, champ, v) { jour(sel).ex[cur][i][champ] = v; save(); }
+function valider(i) {
+  const s = jour(sel).ex[cur][i];
+  if (!s.ok && !s.reps) { const e = EX[cur]; if (e.reps !== 'max') s.reps = e.reps.split('-')[0]; }
+  s.ok = !s.ok; save(); renderSets();
+  if (s.ok) { if (navigator.vibrate) navigator.vibrate(20); lancerRepos(EX[cur].repos); }
+}
+function ajoutSerie() { const sets = jour(sel).ex[cur], l = sets[sets.length - 1] || {}; sets.push({ kg: l.kg || '', reps: l.reps || '', ok: false }); save(); renderSets(); }
+function fermer() { document.getElementById('sheet').classList.remove('open'); render(); }
+const fmtRepos = s => s >= 60 ? (s % 60 ? Math.floor(s / 60) + ' min ' + (s % 60) + ' s' : (s / 60) + ' min') : s + ' s';
+
+// ===== Cloche de repos =====
+let tFin = 0, tTot = 0, tick = null, ac = null;
+function lancerRepos(sec) {
+  tTot = sec; tFin = Date.now() + sec * 1000;
+  const b = document.getElementById('bell'); b.classList.remove('ding'); b.classList.add('show');
+  document.getElementById('bellBtn').textContent = 'Passer';
+  try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } catch (e) {}
+  clearInterval(tick); majCloche(); tick = setInterval(majCloche, 250);
+}
+function majCloche() {
+  const r = Math.max(0, Math.ceil((tFin - Date.now()) / 1000));
+  document.getElementById('bellTime').textContent = Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0');
+  document.getElementById('bellLabel').textContent = r ? 'Repos' : 'Ding, série suivante';
+  document.getElementById('ringFg').style.strokeDashoffset = (113.1 * (1 - r / tTot)).toFixed(1);
+  if (!r) { clearInterval(tick); sonner(); const b = document.getElementById('bell'); b.classList.add('ding'); document.getElementById('bellBtn').textContent = 'OK'; setTimeout(() => b.classList.remove('show'), 6000); }
+}
+function sonner() {
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  if (!ac) return;
+  [0, .35].forEach(t0 => { const o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.value = 1320; g.gain.setValueAtTime(.0001, ac.currentTime + t0); g.gain.exponentialRampToValueAtTime(.4, ac.currentTime + t0 + .01); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + t0 + 1.1); o.connect(g).connect(ac.destination); o.start(ac.currentTime + t0); o.stop(ac.currentTime + t0 + 1.2); });
+}
+document.getElementById('bellBtn').onclick = () => { clearInterval(tick); document.getElementById('bell').classList.remove('show'); };
+
+// ===== Historique et sauvegarde =====
+function renderHist(app) {
+  const ks = Object.keys(D.jours).filter(k => Object.values(D.jours[k].ex).some(s => s.some(z => z.ok))).sort().reverse();
+  let h = `<header class="top"><div><h1>Historique</h1><p>${ks.length} séance${ks.length > 1 ? 's' : ''}</p></div>
+    <button class="iconbtn" type="button" onclick="render()" aria-label="Retour">${I.back}</button></header><div class="block">`;
+  if (!ks.length) h += '<p class="empty">Rien encore. Coche ta première série et elle apparaîtra ici.</p>';
+  ks.forEach(k => {
+    const ex = Object.entries(D.jours[k].ex).filter(([, s]) => s.some(z => z.ok));
+    h += `<div class="hrow"><strong>${dateFr(k)}</strong>${ex.map(([id, s]) => `<small class="num">${EX[id] ? EX[id].nom : id} : ${resume(s)}</small>`).join('<br>')}</div>`;
+  });
+  h += '</div><div class="row" style="margin-top:12px"><button class="btn btn-ghost" type="button" onclick="exporter()">Sauvegarder</button><button class="btn btn-ghost" type="button" onclick="importer()">Restaurer</button></div>';
+  app.innerHTML = h;
+}
+function exporter() {
+  const blob = new Blob([JSON.stringify(D, null, 1)], { type: 'application/json' });
+  const f = new File([blob], 'muscu-' + iso(today) + '.json', { type: 'application/json' });
+  if (navigator.canShare && navigator.canShare({ files: [f] })) navigator.share({ files: [f], title: 'Sauvegarde muscu' }).catch(() => {});
+  else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = f.name; a.click(); }
+}
+function importer() {
+  const i = document.createElement('input'); i.type = 'file'; i.accept = 'application/json,.json';
+  i.onchange = () => { const r = new FileReader(); r.onload = () => { try { const x = JSON.parse(r.result); if (x && x.jours) { D = x; save(); render('hist'); } } catch (e) {} }; r.readAsText(i.files[0]); };
+  i.click();
+}
+
+render();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
