@@ -511,7 +511,7 @@ function vueSeance() {
   });
   const tout = s.liste.every(id => (log[id] || []).filter(z => z.ok).length >= nbSeries(EX[id]));
   h += `<div class="fin"><button class="btn ${tout ? 'btn-main' : 'btn-ghost'}" type="button" onclick="terminer('${k}')">${S.faites[k] ? 'Séance validée' : 'Terminer la séance'}</button></div>`;
-  if (S.faites[k] || s.liste.some(id => (log[id] || []).some(z => z.ok))) h += `<button class="lien-annuler" type="button" onclick="annulerSeance('${k}')">Annuler cette séance (effacer ce qui est noté aujourd’hui)</button>`;
+  if (S.faites[k] || s.liste.some(id => (log[id] || []).some(z => z.ok || z.reps || (z.kg !== '' && z.kg != null && z.kg !== propose(id).kg)))) h += `<button class="lien-annuler" type="button" onclick="annulerSeance('${k}')">Annuler cette séance (effacer ce qui est noté aujourd’hui)</button>`;
   h += `</section>`;
   document.getElementById('app').innerHTML = h;
 }
@@ -650,7 +650,7 @@ function vueProgres() {
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
   recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
   h += `</section></div><div class="row" style="margin-top:16px"><button class="btn btn-ghost" type="button" onclick="exporter()">Sauvegarder</button><button class="btn btn-ghost" type="button" onclick="importer()">Restaurer</button></div>
-    <p class="aide">${SYNC ? 'Copie de secours automatique chez ton robot à chaque séance.' : 'Pas encore relié au robot : ouvre le lien envoyé sur Telegram.'}</p>`;
+    <p class="aide">Version du 5 nov. 11h35 · ${SYNC ? 'Copie de secours automatique chez ton robot à chaque séance.' : 'Pas encore relié au robot : ouvre le lien envoyé sur Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
 function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
