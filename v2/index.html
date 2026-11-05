@@ -34,11 +34,11 @@ a{color:inherit}
 .num{font-variant-numeric:tabular-nums}
 svg.ic{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .wrap{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 96px)}
-h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line-height:1}
+h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line-height:1}
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
 .top p{color:var(--t2);font-size:15px;margin-top:4px}
 .pill{display:flex;align-items:center;gap:6px;height:40px;padding:0 12px;border-radius:12px;background:var(--s1);border:1px solid var(--hair);font-weight:600;font-size:15px}
-.pill svg{color:#C88A00}
+.pill svg{color:var(--t3)}
 .card{background:var(--s1);border:1px solid var(--hair);border-radius:16px}
 
 /* Onglets du bas */
@@ -51,7 +51,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line
 /* Semaine */
 .jauge{padding:14px 16px;margin-bottom:16px}
 .jauge .l1{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px}
-.jauge strong{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;white-space:nowrap}
+.jauge strong{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:600;white-space:nowrap}
 .jauge small{color:var(--t2);font-size:14px;text-align:right}
 .barres{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .barres span{height:8px;border-radius:4px;background:var(--s3)}
@@ -64,8 +64,8 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line
 .jour.cible-ok{border-color:var(--ok);background:#EEF7F0}
 .jour.cible-ko{border-color:var(--ko);background:#FCEDEB}
 .date{display:flex;flex-direction:column;align-items:center;padding-top:2px}
-.date b{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--t3)}
-.date strong{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;line-height:1.05}
+.date b{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:var(--t3)}
+.date strong{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:600;line-height:1.05}
 .jour.auj .date b{color:var(--gant)}
 .contenu{display:flex;flex-direction:column;gap:6px;min-width:0}
 .ligne{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--t2);min-width:0}
@@ -90,7 +90,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line
 
 /* Séance */
 .sess{padding:18px 16px 8px}
-.sess h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px;line-height:1.05;display:flex;align-items:center;gap:10px}
+.sess h2{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:30px;line-height:1.05;display:flex;align-items:center;gap:10px}
 .sess h2 i{width:12px;height:12px;border-radius:3px;background:var(--c);flex:none}
 .sess p{color:var(--t2);font-size:15px;margin-top:4px}
 .choixS{display:flex;gap:8px;margin-bottom:12px}
@@ -124,7 +124,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line
 .anim .pas i.on{background:var(--t1)}
 @keyframes flip{0%,38%{opacity:0}50%,88%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.anim img+img{animation:none;opacity:0}}
-.ex-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;line-height:1.05}
+.ex-title{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:34px;line-height:1.05}
 .ex-meta{color:var(--t2);margin:6px 0 14px}
 .bloc{padding:14px 16px;margin-bottom:10px}
 .bloc h3{font-size:14px;font-weight:600;color:var(--t2);margin-bottom:8px}
@@ -160,12 +160,12 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line
 .panneau{position:fixed;left:0;right:0;bottom:0;z-index:80;background:var(--s1);border-radius:22px 22px 0 0;padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 16px);max-width:560px;margin:0 auto;transform:translateY(105%);transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 -8px 30px rgba(20,18,15,.12)}
 .panneau.show{transform:none}
 .poignee{width:40px;height:5px;border-radius:3px;background:var(--s3);margin:0 auto 14px}
-.panneau h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:26px;line-height:1.1}
+.panneau h2{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:26px;line-height:1.1}
 .panneau .sous{color:var(--t2);font-size:14px;margin:2px 0 16px}
 .panneau h3{font-size:14px;font-weight:600;color:var(--t2);margin:0 0 8px}
 .choix{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:18px}
 .choix button{height:56px;border-radius:12px;border:1px solid var(--hair2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
-.choix button b{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--t3);letter-spacing:.04em}
+.choix button b{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--t3)}
 .choix button span{font-weight:600;font-size:17px;font-variant-numeric:tabular-nums}
 .choix button.ko{background:var(--bg);color:var(--t3);border-color:transparent}
 .choix button.ko span{text-decoration:line-through;text-decoration-color:var(--ko);text-decoration-thickness:2px}
@@ -188,7 +188,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line
 .bell .ring .bg{stroke:rgba(255,255,255,.18)}
 .bell .ring .fg{stroke:var(--gant);stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 1s linear}
 .bell .txt{flex:1}
-.bell .txt strong{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1}
+.bell .txt strong{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:600;line-height:1}
 .bell .txt small{display:block;color:rgba(255,255,255,.7);font-size:13px}
 .bell.ding{background:var(--gant)}
 .bell.ding .ring .fg{stroke:#fff}
@@ -204,7 +204,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line
 .toast small{color:var(--t2);font-size:14px}
 
 /* Progrès */
-.prog h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:24px;margin:20px 0 10px}
+.prog h2{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:24px;margin:20px 0 10px}
 .bloc-an{padding:16px;margin-bottom:12px}
 .bloc-an .etapes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 8px}
 .bloc-an .etapes span{height:8px;border-radius:4px;background:var(--s3)}
@@ -288,7 +288,7 @@ const SEANCES = {
 };
 const BOXE = [0, 1, 2, 4];   // lundi, mardi, mercredi, vendredi (circuit training le matin)
 const DEFAUT = { A:{j:1,h:'18:00'}, B:{j:3,h:'18:00'}, C:{j:5,h:'11:00'} };   // mardi, jeudi, samedi
-const JOURS = ['LUN','MAR','MER','JEU','VEN','SAM','DIM'], NOMS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+const JOURS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], NOMS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
 // L'année en 4 blocs de 3 mois
 const BLOCS = [
   {nom:'Bloc 1 · Les bases',obj:'Bien faire chaque mouvement, 3 séances par semaine, 3 tractions strictes'},
@@ -414,7 +414,7 @@ function vueSemaine() {
   const S = semaine(), faites = Object.keys(S.faites).length, restantes = ['A','B','C'].filter(k => !S.faites[k]);
   const fin = dateJ(6);
   let h = `<header class="top"><div><h1>Ma semaine</h1><p>${LUNDI.getDate()} au ${fin.getDate()} ${fin.toLocaleDateString('fr-FR', { month:'long' })}</p></div>
-    <span class="pill num">${I.feu}${serie()} semaine${serie() > 1 ? 's' : ''}</span></header>
+    ${serie() ? `<span class="pill num">${I.feu}${serie()} semaine${serie() > 1 ? 's' : ''}</span>` : ''}</header>
     <section class="card jauge"><div class="l1"><strong class="num">${faites} séance${faites > 1 ? 's' : ''} sur 3</strong><small>${(() => { const cal = restantes.filter(k => S.place[k].j != null).length; return !restantes.length ? 'Semaine complète, bravo' : cal === restantes.length ? restantes.length + ' à faire, déjà calée' + (cal > 1 ? 's' : '') : cal + ' calée' + (cal > 1 ? 's' : '') + ' d’ici samedi'; })()}</small></div>
     <div class="barres">${['A','B','C'].map(k => `<span class="${S.faites[k] ? 'fait' : (S.place[k].j != null ? 'cale' : '')}"></span>`).join('')}</div></section><section class="jours">`;
   for (let i = 0; i < 7; i++) {
@@ -515,7 +515,7 @@ function terminer(k) {
   if (!faits) return toast({ ok:false, t:'Rien de noté', s:'Coche au moins une série pour valider la séance.' });
   S.faites[k] = iso(auj); S.place[k].j = AUJ; save();
   const n = Object.keys(S.faites).length;
-  toast({ ok:true, t:SEANCES[k].nom + ' validée', s:n >= 3 ? 'Semaine complète 🔥' : (3 - n) + ' séance' + (3 - n > 1 ? 's' : '') + ' encore cette semaine.' });
+  toast({ ok:true, t:SEANCES[k].nom + ' validée', s:n >= 3 ? 'Semaine complète' : (3 - n) + ' séance' + (3 - n > 1 ? 's' : '') + ' encore cette semaine.' });
   render();
 }
 
@@ -612,7 +612,7 @@ document.getElementById('bellBtn').onclick = () => { clearInterval(tick); docume
 // ============ Progrès ============
 function vueProgres() {
   const semaines = numSemaine(SEM), bloc = blocDe(semaines), legere = estLegere(semaines);
-  let h = `<header class="top"><div><h1>Progrès</h1><p>Semaine ${semaines + 1} de ton programme</p></div><span class="pill num">${I.feu}${serie()}</span></header>
+  let h = `<header class="top"><div><h1>Progrès</h1><p>Semaine ${semaines + 1} de ton programme</p></div>${serie() ? `<span class="pill num">${I.feu}${serie()}</span>` : ''}</header>
     <section class="card bloc-an"><strong>${BLOCS[bloc].nom}</strong><p>${BLOCS[bloc].obj}</p><div class="etapes">${BLOCS.slice(0, 4).map((b, i) => `<span class="${i <= bloc ? 'on' : ''}"></span>`).join('')}</div>
     <p>${legere ? 'Cette semaine est une semaine légère : 2 séries au lieu de 3, mêmes poids, pour récupérer.' : 'Une semaine légère toutes les 6 semaines (la prochaine : semaine ' + (Math.floor((semaines + 1) / 6) * 6 + 6) + '), et un test de tes records tous les 3 mois.'}</p></section>`;
   // Poids du corps : le vrai juge de la prise de masse
