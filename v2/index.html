@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Muscu">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="../icon-180.png">
 <link rel="icon" type="image/png" href="../icon-180.png">
 <title>Muscu · Ludo</title>
@@ -115,6 +116,12 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line
 .anim img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .anim img+img{animation:flip 2.6s ease-in-out infinite}
 .anim .lab{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.92);border-radius:8px;padding:4px 8px;font-size:12px;font-weight:600;color:var(--t2)}
+.anim.photos{aspect-ratio:4/5;background:#F7F6F3}
+.anim.photos img{object-fit:contain;opacity:0;animation:none}
+.anim.photos img.on{opacity:1}
+.anim .pas{position:absolute;right:10px;bottom:10px;display:flex;gap:4px}
+.anim .pas i{width:6px;height:6px;border-radius:3px;background:rgba(20,18,15,.18)}
+.anim .pas i.on{background:var(--t1)}
 @keyframes flip{0%,38%{opacity:0}50%,88%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.anim img+img{animation:none;opacity:0}}
 .ex-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;line-height:1.05}
@@ -229,6 +236,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line
 <div class="toast" id="toast" role="status" aria-live="polite"><svg class="ic" viewBox="0 0 24 24" id="toastIc"></svg><div><strong id="toastT"></strong><small id="toastS"></small></div></div>
 
 <script src="agenda.js"></script>
+<script>window.PHOTOS = {rowingbarre:1,rowing1:1,curlbarre:1,marteau:1,tractions:1,pullover:1,oiseau:1,curlincline:1,australiennes:1,rowing2:1,shrugs:1,curl:1};</script>
 <script>
 // ============ Le programme ============
 // Ludo : 1,84 m, 88 kg, sportif depuis 4 mois (circuit training le matin, 100 pompes par jour), novice en muscu.
@@ -287,13 +295,18 @@ const BLOCS = [
   {nom:'Bloc 2 · Monter les charges',obj:'5 tractions strictes, rowing barre à ton poids de départ + 10 kg'},
   {nom:'Bloc 3 · Force',obj:'8 tractions strictes, plus de séries lourdes'},
   {nom:'Bloc 4 · Lesté',obj:'Tractions avec 5 kg à la ceinture'},
+  {nom:'Année 2 et après · Garder et grossir',obj:'Même rythme. Un mois lourd (6 à 8 répétitions), un mois plus léger (10 à 12), et un test de records tous les 3 mois'},
 ];
+// semaine n° (0 = première) depuis le début du programme ; après 1 an, on reste sur le bloc « garder et grossir »
+const blocDe = s => s < 52 ? Math.floor(s / 13) : 4;
+const estLegere = s => s > 0 && (s + 1) % 6 === 0;   // 1 semaine légère toutes les 6 : 2 séries au lieu de 3
+function numSemaine(lundiIso) { return Math.max(0, Math.round((new Date(lundiIso + 'T12:00') - lundiDe(new Date(D.debut + 'T12:00'))) / (7 * 86400000))); }
 
 // ============ Données (sur ce téléphone, sauvegarde possible) ============
 const CLE = 'muscu-ludo-v2';
 let D; try { D = JSON.parse(localStorage.getItem(CLE)) || {}; } catch (e) { D = {}; }
 D.debut = D.debut || iso(new Date()); D.semaines = D.semaines || {}; D.log = D.log || {};
-function save() { try { localStorage.setItem(CLE, JSON.stringify(D)); } catch (e) {} }
+function save() { try { localStorage.setItem(CLE, JSON.stringify(D)); } catch (e) {} if (typeof pousser === 'function') pousser(); }
 function iso(d) { const x = new Date(d); x.setHours(12, 0, 0, 0); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 10); }
 const auj = new Date(); auj.setHours(12, 0, 0, 0);
 const jIdx = d => (new Date(d).getDay() + 6) % 7;
@@ -314,7 +327,42 @@ function semaine() {
   }
   return D.semaines[SEM];
 }
-const AGENDA = window.AGENDA || {};   // rendez-vous de la semaine, fournis par le robot (vide en attendant)
+// Séance prévue un jour passé et pas faite : le coach la recale tout seul sur le prochain jour possible (sinon on reprend lundi)
+function recaler() {
+  const S = semaine(), msgs = [];
+  if (SEM === '2026-11-02' && !D.recal0511 && !Object.keys(S.faites).length) {   // 05/11 : épaules + biceps faits le 04, courbatures → seulement la B samedi, le programme démarre lundi
+    D.recal0511 = 1; S.place = { A:{ j:null, h:'18:30' }, B:{ j:5, h:'11:00' }, C:{ j:null, h:'18:30' } }; S.manquees = {}; save(); return;
+  }
+  for (const k of ['A','B','C']) {
+    const p = S.place[k]; if (S.faites[k] || p.j == null) continue;
+    const passe = p.j < AUJ || (p.j === AUJ && min(p.h) + 90 < new Date().getHours() * 60 + new Date().getMinutes());
+    if (!passe) continue;
+    const avant = p.j; p.j = null; let mis = null;
+    for (let j = AUJ; j <= 5 && !mis; j++) for (const h of (j === 5 ? ['11:00', '18:30'] : ['18:30', '20:00'])) { const v = verdict(k, j, h); if (v.ok) { mis = { j, h: v.heure || h }; break; } }
+    S.manquees = S.manquees || {}; S.manquees[k] = avant;
+    if (mis) { p.j = mis.j; p.h = mis.h; msgs.push(SEANCES[k].nom + ' pas faite ' + NOMS[avant] + ', recalée ' + NOMS[mis.j] + ' à ' + mis.h); }
+    else msgs.push(SEANCES[k].nom + ' pas faite ' + NOMS[avant] + ', plus de place sans te cramer : on reprend lundi');
+  }
+  if (msgs.length) { save(); setTimeout(() => toast({ ok:true, t:'Ta semaine est recalée', s:msgs.join('. ') }), 400); }
+}
+// Rendez-vous (gris) : envoyés par le robot du Mac Mini, gardés sur le téléphone pour marcher hors ligne
+let AGENDA = Object.assign({}, window.AGENDA || {}, (() => { try { return JSON.parse(localStorage.getItem('muscu-agenda')) || {}; } catch (e) { return {}; } })());
+const SYNC = (() => { try { const c = new URLSearchParams(location.search).get('cle'); if (c) localStorage.setItem('muscu-sync', c); return localStorage.getItem('muscu-sync'); } catch (e) { return null; } })();
+function chargerAgenda() {
+  if (!SYNC) return;
+  fetch('https://ntfy.sh/' + SYNC + '-agenda/json?poll=1&since=36h').then(r => r.text()).then(t => {
+    const l = t.trim().split('\n').filter(Boolean).map(x => { try { return JSON.parse(x); } catch (e) { return null; } }).filter(x => x && x.event === 'message');
+    if (!l.length) return; const a = JSON.parse(l[l.length - 1].message); if (!a || typeof a !== 'object') return;
+    AGENDA = a; try { localStorage.setItem('muscu-agenda', JSON.stringify(a)); } catch (e) {}
+    if (onglet === 'semaine' && !document.getElementById('sheet').classList.contains('open') && !document.getElementById('panneau').classList.contains('show')) render();
+  }).catch(() => {});
+}
+// Sauvegarde automatique chez le robot (copie de secours + rappels + bilan du dimanche)
+let tSync = null;
+function pousser() {
+  if (!SYNC) return; clearTimeout(tSync);
+  tSync = setTimeout(() => { fetch('https://ntfy.sh/' + SYNC + '?filename=etat.json', { method:'POST', body: JSON.stringify({ v:2, at: new Date().toISOString(), D }) }).catch(() => {}); }, 4000);
+}
 
 // ============ Navigation ============
 let onglet = 'semaine', seanceVue = null;
@@ -352,9 +400,9 @@ function verdict(k, j, heure) {
   if (conflit) return { ok:true, t:'Possible ' + NOMS[j], s:conflit.t + ' à ' + conflit.h + ' : je la décale à ' + plus(conflit.h, 90) + '.', heure:plus(conflit.h, 90) };
   return { ok:true, t:'Calé ' + NOMS[j] + ' à ' + h, s:BOXE.includes(j) ? 'Jour de boxe : le soir, c’est bon. Bois bien.' : 'Rappel le matin même.' };
 }
-function serie() {   // semaines complètes d'affilée (la semaine en cours compte si elle est déjà complète)
-  let n = 0; const ks = Object.keys(D.semaines).sort().reverse();
-  for (const k of ks) { const f = Object.keys(D.semaines[k].faites || {}).length; if (f >= 3) n++; else if (k !== SEM) break; }
+function serie() {   // semaines « actives » d'affilée (au moins 2 séances) : une semaine à 2 ne casse pas la série
+  let n = 0; const ks = Object.keys(D.semaines).filter(k => k <= SEM).sort().reverse();
+  for (const k of ks) { const f = Object.keys(D.semaines[k].faites || {}).length; if (f >= 2) n++; else if (k !== SEM) break; }
   return n;
 }
 function vueSemaine() {
@@ -437,6 +485,8 @@ function brancher() {
 }
 
 // ============ Séance du jour ============
+const LEGERE = () => estLegere(numSemaine(SEM));
+const nbSeries = e => LEGERE() ? Math.min(2, e.series) : e.series;
 function seanceDuJour() { const S = semaine(); return Object.keys(S.place).find(k => S.place[k].j === AUJ) || ['A','B','C'].find(k => !S.faites[k]) || 'A'; }
 function vueSeance() {
   const S = semaine(); if (!seanceVue) seanceVue = seanceDuJour();
@@ -444,12 +494,13 @@ function vueSeance() {
   let h = `<header class="top"><div><h1>Séance</h1><p>${prevue ? 'Prévue aujourd’hui à ' + S.place[k].h : S.faites[k] ? 'Déjà faite cette semaine' : (S.place[k].j != null ? 'Prévue ' + NOMS[S.place[k].j] : 'Pas encore calée')}</p></div></header>
     <div class="choixS">${['A','B','C'].map(x => `<button type="button" class="${x === k ? 'on' : ''}" onclick="seanceVue='${x}';render()">${x}${S.faites[x] ? ' ✓' : ''}</button>`).join('')}</div>
     <section class="card"><div class="sess" style="--c:${s.c}"><h2><i></i>${s.nom}</h2><p>${s.sous} · ${s.duree} min · échauffement 5 min au rameur avant</p></div>`;
+  if (LEGERE()) h += `<p class="conseil">Semaine légère : 2 séries par exercice au lieu de 3, mêmes poids. Ton corps encaisse les 5 semaines d’avant, c’est là que tu grossis.</p>`;
   s.liste.forEach(id => {
-    const e = EX[id], sets = (log[id] || []), n = sets.filter(z => z.ok).length, ok = n >= e.series, prop = propose(id);
-    h += `<button type="button" class="ex${ok ? ' done' : ''}" onclick="ouvrir('${id}')"><img class="thumb" src="../img/${e.img}-0.webp" alt="" loading="lazy">
-      <div class="txt"><strong>${e.nom}</strong><small class="num">${e.series} × ${e.reps[0]}-${e.reps[1]}${e.par ? ' ' + e.par : ''}${prop.kg ? ' · ' + fmt(prop.kg) + ' kg' : ''}${n ? ' · ' + n + '/' + e.series : ''}</small></div><span class="state">${ok ? I.check : I.chev}</span></button>`;
+    const e = EX[id], sets = (log[id] || []), n = sets.filter(z => z.ok).length, ok = n >= nbSeries(e), prop = propose(id);
+    h += `<button type="button" class="ex${ok ? ' done' : ''}" onclick="ouvrir('${id}')"><img class="thumb" src="${vignette(id)}" alt="" loading="lazy">
+      <div class="txt"><strong>${e.nom}</strong><small class="num">${nbSeries(e)} × ${e.reps[0]}-${e.reps[1]}${e.par ? ' ' + e.par : ''}${prop.kg ? ' · ' + fmt(prop.kg) + ' kg' : ''}${n ? ' · ' + n + '/' + nbSeries(e) : ''}</small></div><span class="state">${ok ? I.check : I.chev}</span></button>`;
   });
-  const tout = s.liste.every(id => (log[id] || []).filter(z => z.ok).length >= EX[id].series);
+  const tout = s.liste.every(id => (log[id] || []).filter(z => z.ok).length >= nbSeries(EX[id]));
   h += `<div class="fin"><button class="btn ${tout ? 'btn-main' : 'btn-ghost'}" type="button" onclick="terminer('${k}')">${S.faites[k] ? 'Séance validée' : 'Terminer la séance'}</button></div></section>`;
   document.getElementById('app').innerHTML = h;
 }
@@ -469,21 +520,48 @@ function historique(id) { return Object.keys(D.log).filter(d => d < iso(auj) && 
 function propose(id) {
   const e = EX[id], h = historique(id), last = h[h.length - 1];
   if (!last) return { kg: e.poidsCorps ? 0 : e.depart, test: true, txt: e.poidsCorps ? 'Première fois : fais le maximum propre à chaque série.' : 'Première fois : commence à ' + fmt(e.depart) + ' kg. Si les ' + e.reps[1] + ' répétitions passent facilement, prends plus lourd à la série suivante.' };
-  const kg = Math.max(...last.sets.map(s => Number(s.kg) || 0)), top = last.sets.length >= e.series && last.sets.every(s => Number(s.reps) >= e.reps[1]);
-  if (e.poidsCorps) return { kg: 0, txt: top ? 'Toutes tes séries à ' + e.reps[1] + ' : passe à la version plus dure.' : 'Essaie de faire 1 répétition de plus que la dernière fois.' };
+  const kg = Math.max(...last.sets.map(s => Number(s.kg) || 0)), top = last.sets.length >= Math.min(2, e.series) && last.sets.every(s => Number(s.reps) >= e.reps[1]);
+  if (e.poidsCorps) {
+    const lest = kg;
+    if (top) return { kg: lest + 2.5, up: true, txt: 'Toutes tes séries à ' + e.reps[1] + ' : ajoute ' + fmt(lest + 2.5) + ' kg de lest (sac à dos ou haltère entre les pieds), ou passe à la version plus dure.' };
+    return { kg: lest, txt: (lest ? 'Toujours ' + fmt(lest) + ' kg de lest. ' : '') + 'Essaie de faire 1 répétition de plus que la dernière fois.' };
+  }
   if (top) return { kg: kg + e.pas, up: true, txt: 'Toutes tes séries à ' + e.reps[1] + ' la dernière fois : on monte à ' + fmt(kg + e.pas) + ' kg.' };
+  // bloqué : 3 séances de suite au même poids sans atteindre le haut, ou la dernière très en dessous → on repart un peu plus léger
+  const l3 = h.slice(-3), bloque = l3.length === 3 && l3.every(x => Math.max(...x.sets.map(s => Number(s.kg) || 0)) === kg);
+  const tropLourd = last.sets.every(s => Number(s.reps) < e.reps[0]);
+  if ((bloque || tropLourd) && kg > e.pas) { const moins = Math.max(e.pas, Math.round(kg * 0.9 / e.pas) * e.pas); return { kg: moins, txt: (tropLourd ? 'La dernière fois c’était trop lourd' : 'Tu bloques à ' + fmt(kg) + ' kg depuis 3 séances') + ' : on repart à ' + fmt(moins) + ' kg, bien propre, et on remonte. C’est normal, c’est comme ça qu’on repasse un palier.' }; }
   return { kg, txt: 'Même poids que la dernière fois, vise ' + e.reps[1] + ' répétitions partout.' };
 }
 
+
+// Photos de Ludo (4 étapes par mouvement) quand elles existent, sinon les dessins d'origine
+const PHOTOS = window.PHOTOS || {};
+const vignette = id => PHOTOS[id] ? 'photos/' + id + '-1.webp' : '../img/' + EX[id].img + '-0.webp';
+const ETAPES_LAB = ['départ', 'en route', 'contracte', 'on redescend'];
+let tAnim = null;
+function animation(id) {
+  const e = EX[id]; clearInterval(tAnim);
+  if (!PHOTOS[id]) return `<div class="anim"><img src="../img/${e.img}-0.webp" alt="${e.nom}, départ"><img src="../img/${e.img}-1.webp" alt="${e.nom}, arrivée"><span class="lab">départ, puis arrivée</span></div>`;
+  setTimeout(() => {
+    const box = document.querySelector('.anim.photos'); if (!box) return;
+    const imgs = box.querySelectorAll('img'), pts = box.querySelectorAll('.pas i'), lab = box.querySelector('.lab'); let i = 0;
+    const montre = () => { imgs.forEach((x, k) => x.classList.toggle('on', k === i)); pts.forEach((x, k) => x.classList.toggle('on', k === i)); lab.textContent = (i + 1) + ' · ' + ETAPES_LAB[i]; };
+    montre(); if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    tAnim = setInterval(() => { if (!document.body.contains(box)) return clearInterval(tAnim); i = (i + 1) % imgs.length; montre(); }, 900);
+    box.onclick = () => { clearInterval(tAnim); i = (i + 1) % imgs.length; montre(); };
+  }, 0);
+  return `<div class="anim photos">${[1,2,3,4].map(n => `<img src="photos/${id}-${n}.webp" alt="${e.nom}, étape ${n}">`).join('')}<span class="lab"></span><span class="pas"><i></i><i></i><i></i><i></i></span></div>`;
+}
 // La fiche = le cours de l'exercice
 let cur = null;
 function ouvrir(id) {
   cur = id; const e = EX[id], log = jourLog(), prop = propose(id), h0 = historique(id), last = h0[h0.length - 1];
-  if (!log[id]) log[id] = Array.from({ length: e.series }, () => ({ kg: e.poidsCorps ? '' : prop.kg, reps: '', ok: false }));
+  if (!log[id]) log[id] = Array.from({ length: nbSeries(e) }, () => ({ kg: e.poidsCorps ? (prop.kg || '') : prop.kg, reps: '', ok: false }));
   const yt = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.video);
   let h = `<button class="iconbtn" type="button" onclick="fermer()" aria-label="Retour">${I.down}</button>
-    <div class="anim"><img src="../img/${e.img}-0.webp" alt="${e.nom}, départ"><img src="../img/${e.img}-1.webp" alt="${e.nom}, arrivée"><span class="lab">départ, puis arrivée</span></div>
-    <h2 class="ex-title">${e.nom}</h2><p class="ex-meta num">${e.series} séries de ${e.reps[0]} à ${e.reps[1]}${e.par ? ' ' + e.par : ''} · repos ${e.repos >= 60 ? (e.repos / 60).toString().replace('.', ',') + ' min' : e.repos + ' s'} · ${e.muscles}</p>
+    ${animation(id)}
+    <h2 class="ex-title">${e.nom}</h2><p class="ex-meta num">${nbSeries(e)} séries de ${e.reps[0]} à ${e.reps[1]}${e.par ? ' ' + e.par : ''} · repos ${e.repos >= 60 ? (e.repos / 60).toString().replace('.', ',') + ' min' : e.repos + ' s'} · ${e.muscles}</p>
     <section class="card bloc"><h3>Comment faire</h3><ol>${e.etapes.map((x, i) => `<li><b>${i + 1}</b><span>${x}</span></li>`).join('')}</ol></section>
     <section class="card bloc"><h3>Les 2 erreurs à éviter</h3><ul>${e.erreurs.map(x => `<li>${I.x}<span>${x}</span></li>`).join('')}</ul></section>`;
   if (e.plusFacile || e.plusDur) h += `<p class="conseil">${e.plusFacile || e.plusDur}</p>`;
@@ -496,7 +574,7 @@ function ouvrir(id) {
 function renderSets() {
   const e = EX[cur], sets = jourLog()[cur];
   document.getElementById('sets').innerHTML = sets.map((s, i) => `<div class="set${s.ok ? ' on' : ''}"><span class="n num">${i + 1}</span>
-    ${e.poidsCorps ? '<span class="num" style="color:var(--t3);font-size:14px;text-align:center">poids du corps</span>' : `<label class="field"><input type="number" inputmode="decimal" step="0.5" min="0" placeholder="—" value="${s.kg}" aria-label="Série ${i + 1}, kilos" onchange="maj(${i},'kg',this.value)"><em>kg</em></label>`}
+    <label class="field"><input type="number" inputmode="decimal" step="0.5" min="0" placeholder="${e.poidsCorps ? '0' : '—'}" value="${s.kg}" aria-label="Série ${i + 1}, ${e.poidsCorps ? 'lest en kilos' : 'kilos'}" onchange="maj(${i},'kg',this.value)"><em>${e.poidsCorps ? 'lest' : 'kg'}</em></label>
     <label class="field"><input type="number" inputmode="numeric" min="0" placeholder="${e.reps[1]}" value="${s.reps}" aria-label="Série ${i + 1}, répétitions" onchange="maj(${i},'reps',this.value)"><em>rép.</em></label>
     <button type="button" class="check${s.ok ? ' on' : ''}" onclick="valider(${i})" aria-pressed="${s.ok}" aria-label="Série ${i + 1} faite">${I.check}</button></div>`).join('');
 }
@@ -528,24 +606,48 @@ document.getElementById('bellBtn').onclick = () => { clearInterval(tick); docume
 
 // ============ Progrès ============
 function vueProgres() {
-  const semaines = Math.floor((auj - new Date(D.debut + 'T12:00')) / (7 * 86400000)), bloc = Math.min(3, Math.floor(semaines / 13)), legere = semaines > 0 && (semaines + 1) % 6 === 0;
-  let h = `<header class="top"><div><h1>Progrès</h1><p>Semaine ${semaines + 1} de ton année</p></div><span class="pill num">${I.feu}${serie()}</span></header>
-    <section class="card bloc-an"><strong>${BLOCS[bloc].nom}</strong><p>${BLOCS[bloc].obj}</p><div class="etapes">${BLOCS.map((b, i) => `<span class="${i <= bloc ? 'on' : ''}"></span>`).join('')}</div>
-    <p>${legere ? 'Cette semaine est une semaine légère : mêmes exercices, 2 séries au lieu de 3, pour récupérer.' : 'Une semaine légère toutes les 6 semaines, et un test de tes records tous les 3 mois.'}</p></section>
-    <div class="prog"><h2>Tes records</h2><section class="card">`;
-  const recs = Object.keys(EX).map(id => { let best = null; Object.keys(D.log).forEach(d => (D.log[d][id] || []).filter(s => s.ok).forEach(s => { const v = EX[id].poidsCorps ? Number(s.reps) : Number(s.kg); if (v && (!best || v > best.v)) best = { v, d, reps: s.reps }; })); return best ? { id, best } : null; }).filter(Boolean);
+  const semaines = numSemaine(SEM), bloc = blocDe(semaines), legere = estLegere(semaines);
+  let h = `<header class="top"><div><h1>Progrès</h1><p>Semaine ${semaines + 1} de ton programme</p></div><span class="pill num">${I.feu}${serie()}</span></header>
+    <section class="card bloc-an"><strong>${BLOCS[bloc].nom}</strong><p>${BLOCS[bloc].obj}</p><div class="etapes">${BLOCS.slice(0, 4).map((b, i) => `<span class="${i <= bloc ? 'on' : ''}"></span>`).join('')}</div>
+    <p>${legere ? 'Cette semaine est une semaine légère : 2 séries au lieu de 3, mêmes poids, pour récupérer.' : 'Une semaine légère toutes les 6 semaines (la prochaine : semaine ' + (Math.floor((semaines + 1) / 6) * 6 + 6) + '), et un test de tes records tous les 3 mois.'}</p></section>`;
+  // Poids du corps : le vrai juge de la prise de masse
+  const P = Object.keys(D.poids || {}).sort(), dernier = P.length ? D.poids[P[P.length - 1]] : null;
+  let conseil = 'Pèse-toi 1 fois par semaine, le matin à jeun. Pour prendre du muscle : +0,5 à 1 kg par mois, environ 150 g de protéines par jour.';
+  if (P.length >= 2) {
+    const a = P.find(d => (new Date(P[P.length - 1]) - new Date(d)) / 86400000 <= 35) || P[0], jours = (new Date(P[P.length - 1]) - new Date(a)) / 86400000;
+    if (jours >= 21) { const parMois = (dernier - D.poids[a]) * 30 / jours;
+      conseil = parMois < 0.2 ? 'Tu ne prends presque pas (' + fmt(parMois.toFixed(1)) + ' kg/mois) : ajoute une collation (fromage blanc, banane, poignée d’amandes).' : parMois > 1.5 ? 'Tu prends vite (' + fmt(parMois.toFixed(1)) + ' kg/mois) : un peu moins de gras et de sucre, sinon c’est surtout du gras.' : 'Parfait : ' + fmt(parMois.toFixed(1)) + ' kg par mois, c’est le bon rythme pour du muscle.'; }
+  }
+  h += `<div class="prog"><h2>Poids du corps</h2><section class="card"><div class="rec"><div><b>${dernier ? fmt(dernier) + ' kg' : 'Pas encore noté'}</b><br><span>${P.length ? 'Départ ' + fmt(D.poids[P[0]]) + ' kg le ' + new Date(P[0] + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' }) : '88 kg au départ'}</span></div>
+    <label class="field" style="max-width:120px"><input type="number" inputmode="decimal" step="0.1" min="40" max="160" placeholder="${dernier ? fmt(dernier) : '88'}" aria-label="Poids du jour en kilos" onchange="notePoids(this.value)"><em>kg</em></label></div><p class="vide" style="text-align:left">${conseil}</p></section></div>`;
+  // Les semaines : ce qui a été fait et ce qui a sauté (ça ne pénalise rien, ça se voit)
+  const ks = []; for (let l = new Date(LUNDI); l >= lundiDe(new Date(D.debut + 'T12:00')) && ks.length < 12; l.setDate(l.getDate() - 7)) ks.push(iso(l));   // toutes les semaines, même celles où l'appli n'a pas été ouverte
+  const passees = ks.filter(k => k !== SEM), faitesP = passees.reduce((n, k) => n + Object.keys((D.semaines[k] || {}).faites || {}).length, 0);
+  h += `<div class="prog"><h2>Tes semaines</h2><section class="card">`;
+  if (passees.length) h += `<p class="vide" style="text-align:left">Régularité : <b class="num">${faitesP} séance${faitesP > 1 ? 's' : ''} sur ${passees.length * 3}</b> ces ${passees.length} dernière${passees.length > 1 ? 's' : ''} semaine${passees.length > 1 ? 's' : ''}. Une séance sautée ne casse rien : la suivante reprend où tu en étais.</p>`;
+  ks.forEach(k => { const w = D.semaines[k] || { faites:{} }, l = new Date(k + 'T12:00'), f = new Date(l); f.setDate(l.getDate() + 6);
+    h += `<div class="rec"><div><b>${l.getDate()} → ${f.getDate()} ${f.toLocaleDateString('fr-FR', { month:'short' })}</b>${k === SEM ? '<br><span>en cours</span>' : estLegere(numSemaine(k)) ? '<br><span>semaine légère</span>' : ''}</div><b class="num">${['A','B','C'].map(x => x + (w.faites && w.faites[x] ? ' ✓' : k === SEM ? ' ·' : ' –')).join('  ')}</b></div>`; });
+  h += `</section></div><div class="prog"><h2>Tes records</h2><section class="card">`;
+  const recs = Object.keys(EX).map(id => { let best = null; Object.keys(D.log).forEach(d => (D.log[d][id] || []).filter(s => s.ok).forEach(s => { const v = EX[id].poidsCorps ? Number(s.reps) + (Number(s.kg) || 0) / 100 : Number(s.kg); if (v && (!best || v > best.v)) best = { v, d, reps: s.reps, kg: Number(s.kg) || 0 }; })); return best ? { id, best } : null; }).filter(Boolean);
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
-  recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.v + ' rép.' : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
-  h += `</section></div><div class="row" style="margin-top:16px"><button class="btn btn-ghost" type="button" onclick="exporter()">Sauvegarder</button><button class="btn btn-ghost" type="button" onclick="importer()">Restaurer</button></div>`;
+  recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
+  h += `</section></div><div class="row" style="margin-top:16px"><button class="btn btn-ghost" type="button" onclick="exporter()">Sauvegarder</button><button class="btn btn-ghost" type="button" onclick="importer()">Restaurer</button></div>
+    <p class="aide">${SYNC ? 'Copie de secours automatique chez ton robot à chaque séance.' : 'Pas encore relié au robot : ouvre le lien envoyé sur Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
+function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
 function exporter() { const blob = new Blob([JSON.stringify(D)], { type:'application/json' }), f = new File([blob], 'muscu-' + iso(auj) + '.json', { type:'application/json' }); if (navigator.canShare && navigator.canShare({ files:[f] })) navigator.share({ files:[f] }).catch(() => {}); else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = f.name; a.click(); } }
 function importer() { const i = document.createElement('input'); i.type = 'file'; i.accept = '.json,application/json'; i.onchange = () => { const r = new FileReader(); r.onload = () => { try { const x = JSON.parse(r.result); if (x && x.semaines) { D = x; save(); render(); } } catch (e) {} }; r.readAsText(i.files[0]); }; i.click(); }
 
 let tT;
 function toast(v) { const t = document.getElementById('toast'); t.className = 'toast show ' + (v.ok ? 'ok' : 'ko'); document.getElementById('toastIc').innerHTML = v.ok ? '<path d="M5 12.5l4.5 4.5L19 7.5"/>' : '<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.5v.5"/>'; document.getElementById('toastT').textContent = v.t; document.getElementById('toastS').textContent = v.s; clearTimeout(tT); tT = setTimeout(() => t.classList.remove('show'), 4200); }
 
+// Le téléphone garde l'appli ouverte des jours : au retour, si on a changé de jour, on recharge pour repartir sur la bonne date
+document.addEventListener('visibilitychange', () => { if (!document.hidden && iso(new Date()) !== iso(auj)) location.reload(); });
+recaler();
 render();
+chargerAgenda();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
 </html>
