@@ -167,6 +167,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 .r-carte img{width:64px;height:64px;border-radius:8px;object-fit:cover;background:var(--s3)}
 .r-carte strong{display:block;font-weight:600}
 .r-carte small{color:var(--t2);font-size:14px}
+.r-moy{color:var(--t3);font-size:13px;font-weight:500}
 .lien-annuler{display:block;margin:12px auto 4px;background:none;border:0;color:var(--t3);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:3px;padding:8px}
 .anim.photos{aspect-ratio:4/5;background:#F7F6F3}
 .anim.photos img{object-fit:contain;opacity:0;animation:none}
@@ -296,41 +297,41 @@ window.PHOTOS = {rowingbarre:8,rowing1:8,curlbarre:8,marteau:8,tractions:8,pullo
 // But : compenser les pompes (pecs, triceps) en travaillant le dos, le tirage, les biceps, l'arrière d'épaule.
 // Salle : haltères, barres fixes, banc, barre olympique, barre de traction basse. Pas de poulie.
 const EX = {
-  rowingbarre:{nom:'Rowing barre',img:'Bent_Over_Barbell_Row',series:3,reps:[8,10],repos:90,pas:2.5,depart:30,muscles:'Milieu du dos, grand dorsal',
+  rowingbarre:{nom:'Rowing barre',img:'Bent_Over_Barbell_Row',series:3,reps:[8,10],repos:150,pas:2.5,depart:30,muscles:'Milieu du dos, grand dorsal',
     etapes:['Pieds largeur de hanches, genoux un peu fléchis','Penche le buste à 45°, dos bien plat, regard au sol devant toi','Tire la barre vers le bas du ventre en serrant les omoplates','Redescends en 2 secondes jusqu’à bras tendus'],
     erreurs:['Dos rond : baisse le poids tout de suite','Se redresser pour tirer : le buste reste fixe'], video:'rowing barre buste penché technique'},
-  rowing1:{nom:'Rowing haltère un bras',img:'One-Arm_Dumbbell_Row',series:3,reps:[8,12],repos:75,pas:2,depart:16,muscles:'Grand dorsal',par:'par bras',
+  rowing1:{nom:'Rowing haltère un bras',img:'One-Arm_Dumbbell_Row',series:3,reps:[8,12],repos:90,pas:2,depart:16,muscles:'Grand dorsal',par:'par bras',
     etapes:['Genou et main du même côté sur le banc','Dos plat, parallèle au sol','Tire l’haltère vers la hanche, coude près du corps','10 par bras, puis change de côté'],
     erreurs:['Tourner le buste pour monter','Tirer vers l’épaule au lieu de la hanche'], video:'rowing haltère un bras technique'},
-  curlbarre:{nom:'Curl barre',img:'Barbell_Curl',series:3,reps:[8,10],repos:75,pas:2.5,depart:20,muscles:'Biceps',
+  curlbarre:{nom:'Curl barre',img:'Barbell_Curl',series:3,reps:[8,10],repos:90,pas:2.5,depart:20,muscles:'Biceps',
     etapes:['Debout, une barre fixe du rack, mains largeur d’épaules','Coudes collés aux côtes','Monte la barre jusqu’à la poitrine','Redescends lentement jusqu’en bas'],
     erreurs:['Balancer le dos pour monter','Avancer les coudes en haut'], video:'curl barre biceps technique'},
-  marteau:{nom:'Curl marteau',img:'Hammer_Curls',series:3,reps:[10,12],repos:60,pas:2,depart:10,muscles:'Biceps, avant-bras',
+  marteau:{nom:'Curl marteau',img:'Hammer_Curls',series:3,reps:[10,12],repos:75,pas:2,depart:10,muscles:'Biceps, avant-bras',
     etapes:['Un haltère dans chaque main, paumes face à face','Coudes fixes contre le corps','Monte jusqu’à l’épaule','Descends en 2 secondes'],
     erreurs:['Lever le coude','Monter trop vite avec de l’élan'], video:'curl marteau haltères technique'},
-  tractions:{nom:'Tractions',img:'Pullups',series:4,reps:[3,8],repos:120,pas:0,depart:0,poidsCorps:true,muscles:'Grand dorsal, biceps',
+  tractions:{nom:'Tractions',img:'Pullups',series:4,reps:[3,8],repos:150,pas:0,depart:0,poidsCorps:true,muscles:'Grand dorsal, biceps',
     etapes:['Mains un peu plus larges que les épaules, paumes vers l’avant','Pars bras tendus, épaules basses','Tire jusqu’à ce que le menton passe la barre','Redescends complètement, sans balancer'],
     erreurs:['Demi-répétitions : descends bras tendus à chaque fois','Balancer les jambes pour s’aider'],
     plusFacile:'Si tu en fais moins de 3 : saute en haut et descends en 5 secondes (négatives), 4 × 4.', video:'tractions débutant technique'},
-  pullover:{nom:'Pull-over haltère',img:'Straight-Arm_Dumbbell_Pullover',series:3,reps:[10,12],repos:60,pas:2,depart:14,muscles:'Grand dorsal (remplace la poulie)',
+  pullover:{nom:'Pull-over haltère',img:'Straight-Arm_Dumbbell_Pullover',series:3,reps:[10,12],repos:75,pas:2,depart:14,muscles:'Grand dorsal (remplace la poulie)',
     etapes:['Dos à plat sur le banc, un haltère tenu à deux mains','Bras presque tendus au-dessus de la poitrine','Descends l’haltère derrière la tête, sans forcer l’épaule','Remonte en serrant les dorsaux'],
     erreurs:['Plier les coudes : ça devient un exercice de triceps','Descendre trop bas au début'], video:'pull over haltère dorsaux technique'},
   oiseau:{nom:'Oiseau',img:'Reverse_Flyes',series:3,reps:[12,15],repos:60,pas:1,depart:6,muscles:'Arrière d’épaule, haut du dos',
     etapes:['À plat ventre sur le banc incliné, un haltère léger par main','Bras qui pendent, coudes un peu fléchis','Écarte les bras sur les côtés jusqu’à l’horizontale','Serre les omoplates une seconde en haut'],
     erreurs:['Trop lourd : on remonte avec le dos','Monter les épaules vers les oreilles'], video:'oiseau haltères arrière d épaule technique'},
-  curlincline:{nom:'Curl incliné',img:'Incline_Dumbbell_Curl',series:3,reps:[10,12],repos:60,pas:2,depart:8,muscles:'Biceps (étirement)',
+  curlincline:{nom:'Curl incliné',img:'Incline_Dumbbell_Curl',series:3,reps:[10,12],repos:75,pas:2,depart:8,muscles:'Biceps (étirement)',
     etapes:['Banc incliné à 45°, dos bien calé','Bras qui pendent, paumes vers l’avant','Monte sans avancer les coudes','Redescends jusqu’à bras tendus'],
     erreurs:['Décoller le dos du banc','Prendre aussi lourd qu’au curl debout'], video:'curl incliné haltères technique'},
-  australiennes:{nom:'Tractions australiennes',img:'Inverted_Row',series:3,reps:[8,15],repos:75,pas:0,depart:0,poidsCorps:true,muscles:'Haut du dos, arrière d’épaule',
+  australiennes:{nom:'Tractions australiennes',img:'Inverted_Row',series:3,reps:[8,15],repos:90,pas:0,depart:0,poidsCorps:true,muscles:'Haut du dos, arrière d’épaule',
     etapes:['Sous ta barre basse, mains largeur d’épaules','Corps gainé et droit des talons aux épaules','Tire la poitrine jusqu’à la barre','Redescends bras tendus'],
     erreurs:['Fesses qui tombent : serre les abdos','Tirer avec le cou'], plusDur:'Trop facile ? Mets les pieds sur le banc.', video:'traction australienne inverted row technique'},
-  rowing2:{nom:'Rowing haltères buste penché',img:'Bent_Over_Two-Dumbbell_Row',series:3,reps:[10,12],repos:75,pas:2,depart:14,muscles:'Milieu du dos',
+  rowing2:{nom:'Rowing haltères buste penché',img:'Bent_Over_Two-Dumbbell_Row',series:3,reps:[10,12],repos:120,pas:2,depart:14,muscles:'Milieu du dos',
     etapes:['Un haltère par main, buste penché à 45°','Dos plat, genoux fléchis','Tire les deux haltères vers le nombril','Serre une seconde en haut'],
     erreurs:['Dos rond','Mouvement trop court'], video:'rowing haltères buste penché technique'},
   shrugs:{nom:'Haussements d’épaules',img:'Dumbbell_Shrug',series:3,reps:[12,15],repos:60,pas:2,depart:20,muscles:'Trapèzes',
     etapes:['Deux haltères lourds, bras tendus le long du corps','Monte les épaules vers les oreilles','Tiens une seconde en haut','Redescends lentement'],
     erreurs:['Rouler les épaules','Plier les coudes'], video:'shrug haltères trapèzes technique'},
-  curl:{nom:'Curl haltères',img:'Dumbbell_Bicep_Curl',series:3,reps:[10,12],repos:60,pas:2,depart:10,muscles:'Biceps',
+  curl:{nom:'Curl haltères',img:'Dumbbell_Bicep_Curl',series:3,reps:[10,12],repos:75,pas:2,depart:10,muscles:'Biceps',
     etapes:['Debout, un haltère par main','Coudes collés au corps','Monte en tournant la paume vers le haut','Descends en 2 secondes'],
     erreurs:['Balancer le dos','Monter les deux à toute vitesse'], video:'curl haltères biceps technique'},
   laterales:{nom:'Élévations latérales',img:'Side_Lateral_Raise',series:3,reps:[12,15],repos:60,pas:1,depart:6,muscles:'Côté des épaules (la largeur)',
@@ -564,7 +565,7 @@ function vueSeance() {
     h += `<div class="choixS">${['A','B','C'].map(x => `<button type="button" class="${x === k ? 'on' : ''}${x === jour ? ' jour' : ''}${S.faites[x] ? ' faite' : ''}" onclick="seanceVue='${x}';render()"><b>${x}</b><small>${etat(x)}</small></button>`).join('')}</div>`;
     if (jour && k !== jour) h += `<button class="retour-jour" type="button" onclick="seanceVue='${jour}';render()">Ta séance du jour, c’est la ${jour} →</button>`; }
   h += `<section class="card" style="--c:${s.c}"><div class="sess"><h2><i></i>${s.nom}</h2><p>${s.sous} · ${s.duree} min</p></div>`;
-  if (ec) h += `<div class="encours"><div><div class="chrono" id="chrono">${hms(Date.now() - ec.debut)}</div><small>${suiv ? 'Exercice ' + (s.liste.indexOf(suiv) + 1) + ' sur ' + s.liste.length + ' : ' + EX[suiv].nom : 'Tout est fait'}</small></div>${suiv ? `<button class="stop" type="button" onclick="ouvrir('${suiv}')">Reprendre</button>` : `<button class="stop" type="button" onclick="finSeance('${k}')">Terminer</button>`}</div>`;
+  if (ec) h += `<div class="encours"><div><div class="chrono" id="chrono">${hms(Date.now() - ec.debut)}</div><small>${suiv ? 'Exercice ' + (s.liste.indexOf(suiv) + 1) + ' sur ' + s.liste.length + ' : ' + EX[suiv].nom : 'Tout est fait'}</small></div>${suiv ? `<button class="stop" type="button" onclick="${ec.repos ? `pageRepos(${ec.repos.prevu},'${suiv}')` : `ouvrir('${suiv}')`}">Reprendre</button>` : `<button class="stop" type="button" onclick="finSeance('${k}')">Terminer</button>`}</div>`;
   else h += `<p class="conseil" style="margin:0 16px 12px"><b>Échauffement, 8 min :</b> 5 min de rameur tranquille, 10 grands cercles de bras dans chaque sens, puis 1 série légère du 1er exercice (moitié du poids × 10).</p>`;
   if (LEGERE()) h += `<p class="conseil" style="margin:0 16px 12px">Semaine légère : 2 séries par exercice au lieu de 3, mêmes poids. Ton corps encaisse les 5 semaines d’avant, c’est là que tu grossis.</p>`;
   s.liste.forEach(id => {
@@ -582,6 +583,7 @@ function sauter(id) { const ec = enCours(); if (ec && !ec.saute.includes(id)) { 
 // Séance guidée : un exercice, une série à la fois, dans l'ordre du programme
 function guide(id) {
   const ec = enCours(); if (!ec) return ouvrir(id);
+  if (ec.repos) { const r = ec.repos, z = (jourLog()[r.ex] || [])[r.i]; if (z) { z.repos = Math.round((Date.now() - r.debut) / 1000); z.prevu = r.prevu; } delete ec.repos; save(); }
   const k = ec.k, s = SEANCES[k]; id = suivantDe(k); if (!id) { document.getElementById('sheet').classList.remove('open'); return finSeance(k); }
   cur = id; const e = EX[id], sets = initLog(id), tot = nbSeries(e), i = sets.findIndex((z, j) => j < tot && !z.ok), prop = propose(id);
   const n = i < 0 ? tot : i, z = sets[n], fait = sets.filter(x => x.ok), pos = s.liste.indexOf(id) + 1;
@@ -602,12 +604,14 @@ function guide(id) {
 function serieFaite() {
   const e = EX[cur], sets = initLog(cur), tot = nbSeries(e), i = sets.findIndex((z, j) => j < tot && !z.ok); if (i < 0) return guide(cur);
   const z = sets[i], kg = document.getElementById('gKg').value, reps = document.getElementById('gReps').value;
-  z.kg = kg; z.reps = reps || e.reps[1]; z.ok = true;
+  z.kg = kg; z.reps = reps || e.reps[1]; z.ok = true; z.t = Date.now();
   sets.forEach((x, j) => { if (j > i && !x.ok) x.kg = kg; });   // le poids suit sur les séries d'après
   save(); if (navigator.vibrate) navigator.vibrate(20);
   const ec = enCours(), reste = suivantDe(ec.k);
   if (!reste) { document.getElementById('sheet').classList.remove('open'); return finSeance(ec.k); }
-  pageRepos(reste === cur ? e.repos : Math.max(e.repos, 90), reste);
+  const prevu = reste === cur ? e.repos : Math.max(e.repos, 120);   // entre deux exercices : 2 min mini, le temps de s'installer
+  ec.repos = { ex: cur, i, debut: Date.now(), prevu }; save();
+  pageRepos(prevu, reste);
 }
 // Page de repos entre deux séries ou deux exercices : rien ne démarre tant que tu n'appuies pas
 let tRepos = null;
@@ -620,7 +624,7 @@ function pageRepos(sec, id) {
     <div class="r-next"><p>${meme ? 'Ensuite' : 'Exercice suivant · ' + (s.liste.indexOf(id) + 1) + ' sur ' + s.liste.length}</p><div class="r-carte"><img src="${vignette(id)}" alt=""><div><strong>${e.nom}</strong><small class="num">Série ${n} sur ${nbSeries(e)} · ${e.reps[0]} à ${e.reps[1]} rép.</small></div></div></div>
     <button class="btn btn-main g-ok" type="button" onclick="clearInterval(tRepos);guide('${id}')">${meme ? 'C’est parti, série ' + n : 'C’est parti'}</button>`;
   const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
-  let fini = false; window.rFin = Date.now() + sec * 1000;
+  let fini = false; window.rFin = (ec.repos ? ec.repos.debut : Date.now()) + sec * 1000;
   const maj = () => { const el = document.getElementById('rTemps'); if (!el) return clearInterval(tRepos); const r = Math.max(0, Math.ceil((window.rFin - Date.now()) / 1000));
     el.textContent = Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0');
     if (!r && !fini) { fini = true; sonner(); el.classList.add('ding'); document.getElementById('rEtat').textContent = 'C’est l’heure, quand tu es prêt'; }
@@ -650,7 +654,8 @@ function voirBilan(k) {
     const best = Math.max(...ok.map(z => e.poidsCorps ? Number(z.reps) : Number(z.kg) || 0));
     const avantBest = Math.max(0, ...Object.keys(D.log).filter(d => d < date).flatMap(d => (D.log[d][id] || []).filter(z => z.ok).map(z => e.poidsCorps ? Number(z.reps) : Number(z.kg) || 0)));
     const record = avantBest > 0 && best > avantBest;
-    lignes += `<div class="ligne"><span>${e.nom}${record ? ' <b class="up">· record</b>' : ''}</span><b>${ok.map(z => (e.poidsCorps ? '' : fmt(z.kg || 0) + ' kg × ') + z.reps).join(' · ')}</b></div>`;
+    const rr = ok.filter(z => z.repos), rm = rr.length ? rr.reduce((a, z) => a + z.repos, 0) / rr.length : 0;
+    lignes += `<div class="ligne"><span>${e.nom}${record ? ' <b class="up">· record</b>' : ''}${rm ? `<br><small class="r-moy num">repos ${hms(rm * 1000)} en moyenne, prévu ${hms(rr.reduce((a, z) => a + (z.prevu || e.repos), 0) / rr.length * 1000)}</small>` : ''}</span><b>${ok.map(z => (e.poidsCorps ? '' : fmt(z.kg || 0) + ' kg × ') + z.reps).join(' · ')}</b></div>`;
   });
   const prochain = SEANCES[k].liste.map(id => { const p = proposeApres(id); return p ? `<div class="ligne"><span>${EX[id].nom}</span><b class="${p.up ? 'up' : ''}">${p.txt}</b></div>` : ''; }).join('');
   const diff = sa && sa.kg ? Math.round((st.kg - sa.kg) / sa.kg * 100) : null;
@@ -658,10 +663,18 @@ function voirBilan(k) {
     <div class="bilan"><h2>${SEANCES[k].nom} terminée</h2><p class="ex-meta">${new Date(date + 'T12:00').toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' })}</p>
     <div class="stats"><div class="stat"><b>${b.duree ? hms(b.duree) : '–'}</b><span>durée</span></div><div class="stat"><b>${st.series}</b><span>séries</span></div><div class="stat"><b>${Math.round(st.kg).toLocaleString('fr-FR')}</b><span>kg soulevés</span></div></div>
     ${diff !== null ? `<p class="conseil">${diff >= 0 ? '<span class="up">+' + diff + ' %</span> de charge totale' : diff + ' % de charge totale (séance plus courte ou poids de reprise, c’est normal)'} par rapport à ta dernière ${SEANCES[k].nom} (${new Date(avant + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}).</p>` : '<p class="conseil">Première fois : cette séance devient ta référence.</p>'}
+    ${conseilRepos(k, date)}
     <section class="card bloc"><h3>Ce que tu as fait</h3>${lignes}</section>
     <section class="card bloc"><h3>La prochaine fois</h3>${prochain}</section>
     <button class="btn btn-main" type="button" onclick="fermer()" style="margin-top:16px">Fermer</button></div>`;
   const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
+}
+function conseilRepos(k, date) {   // repos réellement pris vs prévus
+  const L = D.log[date] || {}, all = SEANCES[k].liste.flatMap(id => (L[id] || []).filter(z => z.ok && z.repos && z.prevu));
+  if (all.length < 3) return '';
+  const tot = all.reduce((a, z) => a + z.repos, 0), pv = all.reduce((a, z) => a + z.prevu, 0), ecart = Math.round((tot - pv) / pv * 100);
+  const txt = ecart > 25 ? 'Tu as pris ' + ecart + ' % de repos en plus que prévu. Si c’est pour souffler, c’est bien : mieux vaut un repos long et toutes tes répétitions. Si c’est le téléphone, garde le chrono.' : ecart < -20 ? 'Tu as raccourci tes repos de ' + (-ecart) + ' %. Pour prendre du muscle, des repos trop courts font perdre des répétitions : laisse le chrono aller au bout.' : 'Repos bien tenus (' + (ecart >= 0 ? '+' : '') + ecart + ' % par rapport au prévu).';
+  return `<p class="conseil">Repos : ${hms(tot * 1000)} au total. ${txt}</p>`;
 }
 function proposeApres(id) {   // conseil pour la séance d'après, en comptant celle d'aujourd'hui
   const garde = iso; const vrai = auj; const demain = new Date(auj); demain.setDate(demain.getDate() + 1);
@@ -812,7 +825,7 @@ function vueProgres() {
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
   recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
   h += `</section></div><div class="row" style="margin-top:16px"><button class="btn btn-ghost" type="button" onclick="exporter()">Sauvegarder</button><button class="btn btn-ghost" type="button" onclick="importer()">Restaurer</button></div>
-    <p class="aide">Version du 5 nov. 12h35 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
+    <p class="aide">Version du 5 nov. 12h40 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
 function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
