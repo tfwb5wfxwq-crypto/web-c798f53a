@@ -135,6 +135,20 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 .bilan .ligne b{font-variant-numeric:tabular-nums;white-space:nowrap}
 .bilan .ligne .up{color:var(--ok)}
 .sheet .chrono-mini{float:right;margin-top:10px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--t2)}
+.g-haut{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px}
+.g-haut span{text-align:center;color:var(--t2);font-size:15px;font-weight:600}
+.g-haut b{text-align:right;font-weight:600;color:var(--t2)}
+.g-serie{margin:4px 0 6px;font-family:'Barlow Condensed',sans-serif}
+.g-serie b{font-size:44px;font-weight:600;line-height:1}
+.g-serie span{font-size:22px;color:var(--t2)}
+.g-faites{color:var(--t2);font-size:15px;margin-bottom:12px}
+.g-champs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.g-ok{width:100%;height:60px;font-size:19px}
+.g-apres{text-align:center;color:var(--t3);font-size:14px;margin:10px 0 16px}
+.g-cours{border:1px solid var(--hair);border-radius:12px;background:var(--s1);padding:0 12px;margin-bottom:8px}
+.g-cours summary{padding:12px 0;font-weight:600;cursor:pointer}
+.g-cours ol,.g-cours ul{list-style:none;padding:0 0 12px;display:grid;gap:8px;font-size:15px}
+.g-cours li{display:flex;gap:8px}
 .lien-annuler{display:block;margin:12px auto 4px;background:none;border:0;color:var(--t3);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:3px;padding:8px}
 .anim.photos{aspect-ratio:4/5;background:#F7F6F3}
 .anim.photos img{object-fit:contain;opacity:0;animation:none}
@@ -529,21 +543,51 @@ function vueSeance() {
   let h = `<header class="top"><div><h1>Séance</h1><p>${ec ? 'En cours' : prevue ? 'Prévue aujourd’hui à ' + S.place[k].h : S.faites[k] ? 'Déjà faite cette semaine' : (S.place[k].j != null ? 'Prévue ' + NOMS[S.place[k].j] : 'Pas encore calée')}</p></div></header>`;
   if (!ec) h += `<div class="choixS">${['A','B','C'].map(x => `<button type="button" class="${x === k ? 'on' : ''}" onclick="seanceVue='${x}';render()">${x}${S.faites[x] ? ' ✓' : ''}</button>`).join('')}</div>`;
   h += `<section class="card" style="--c:${s.c}"><div class="sess"><h2><i></i>${s.nom}</h2><p>${s.sous} · ${s.duree} min</p></div>`;
-  if (ec) h += `<div class="encours"><div><div class="chrono" id="chrono">${hms(Date.now() - ec.debut)}</div><small>${suiv ? 'Suivant : ' + EX[suiv].nom + ', ou prends celui que tu veux' : 'Tout est fait, tu peux terminer'}</small></div><button class="stop" type="button" onclick="finSeance('${k}')">Terminer</button></div>`;
+  if (ec) h += `<div class="encours"><div><div class="chrono" id="chrono">${hms(Date.now() - ec.debut)}</div><small>${suiv ? 'Exercice ' + (s.liste.indexOf(suiv) + 1) + ' sur ' + s.liste.length + ' : ' + EX[suiv].nom : 'Tout est fait'}</small></div>${suiv ? `<button class="stop" type="button" onclick="ouvrir('${suiv}')">Reprendre</button>` : `<button class="stop" type="button" onclick="finSeance('${k}')">Terminer</button>`}</div>`;
   else h += `<p class="conseil" style="margin:0 16px 12px"><b>Échauffement, 8 min :</b> 5 min de rameur tranquille, 10 grands cercles de bras dans chaque sens, puis 1 série légère du 1er exercice (moitié du poids × 10).</p>`;
   if (LEGERE()) h += `<p class="conseil" style="margin:0 16px 12px">Semaine légère : 2 séries par exercice au lieu de 3, mêmes poids. Ton corps encaisse les 5 semaines d’avant, c’est là que tu grossis.</p>`;
   s.liste.forEach(id => {
     const e = EX[id], n = seriesOk(id), ok = n >= nbSeries(e), prop = propose(id), saute = ec && ec.saute.includes(id);
-    h += `<button type="button" class="ex${ok ? ' done' : ''}${id === suiv ? ' suivant' : ''}${saute ? ' saute' : ''}" onclick="ouvrir('${id}')"><img class="thumb" src="${vignette(id)}" alt="" loading="lazy">
+    h += `<button type="button" class="ex${ok ? ' done' : ''}${id === suiv ? ' suivant' : ''}${saute ? ' saute' : ''}" onclick="ouvrir('${ec ? (suiv || id) : id}')"><img class="thumb" src="${vignette(id)}" alt="" loading="lazy">
       <div class="txt"><strong>${e.nom}${id === suiv ? '<span class="tag">suivant</span>' : ''}</strong><small class="num">${nbSeries(e)} × ${e.reps[0]}-${e.reps[1]}${e.par ? ' ' + e.par : ''}${prop.kg ? ' · ' + fmt(prop.kg) + ' kg' : ''}${n ? ' · ' + n + '/' + nbSeries(e) : ''}${saute ? ' · sauté' : ''}</small></div><span class="state">${ok ? I.check : I.chev}</span></button>`;
   });
-  if (!ec) h += S.faites[k] ? `<div class="fin"><button class="btn btn-ghost" type="button" onclick="voirBilan('${k}')">Revoir le bilan</button></div>` : `<div class="depart"><button class="btn btn-main" type="button" onclick="commencer('${k}')">Commencer la séance</button><p>Le chrono démarre, tu fais les exercices dans l’ordre que tu veux</p></div>`;
+  if (!ec) h += S.faites[k] ? `<div class="fin"><button class="btn btn-ghost" type="button" onclick="voirBilan('${k}')">Revoir le bilan</button></div>` : `<div class="depart"><button class="btn btn-main" type="button" onclick="commencer('${k}')">Commencer la séance</button><p>L’appli te guide : exercice par exercice, série par série, repos compris</p></div>`;
   if (S.faites[k] || s.liste.some(id => (log[id] || []).some(z => z.ok)) || ec) h += `<button class="lien-annuler" type="button" onclick="annulerSeance('${k}')">${ec ? 'Abandonner la séance (rien ne sera compté)' : 'Annuler cette séance (effacer ce qui est noté aujourd’hui)'}</button>`;
   h += `</section>`;
   document.getElementById('app').innerHTML = h;
 }
 function commencer(k) { D.enCours = { k, date: iso(auj), debut: Date.now(), saute: [] }; save(); render(); const id = suivantDe(k); if (id) ouvrir(id); }
-function sauter(id) { const ec = enCours(); if (ec && !ec.saute.includes(id)) { ec.saute.push(id); save(); } fermer(); }
+function sauter(id) { const ec = enCours(); if (ec && !ec.saute.includes(id)) { ec.saute.push(id); save(); } if (ec && suivantDe(ec.k)) guide(); else if (ec) { document.getElementById('sheet').classList.remove('open'); finSeance(ec.k); } else fermer(); }
+// Séance guidée : un exercice, une série à la fois, dans l'ordre du programme
+function guide(id) {
+  const ec = enCours(); if (!ec) return ouvrir(id);
+  const k = ec.k, s = SEANCES[k]; id = suivantDe(k); if (!id) { document.getElementById('sheet').classList.remove('open'); return finSeance(k); }
+  cur = id; const e = EX[id], sets = initLog(id), tot = nbSeries(e), i = sets.findIndex((z, j) => j < tot && !z.ok), prop = propose(id);
+  const n = i < 0 ? tot : i, z = sets[n], fait = sets.filter(x => x.ok), pos = s.liste.indexOf(id) + 1;
+  const apres = s.liste.slice(pos).find(x => seriesOk(x) < nbSeries(EX[x]) && !ec.saute.includes(x));
+  let h = `<div class="g-haut"><button class="iconbtn" type="button" onclick="fermer()" aria-label="Réduire">${I.down}</button><span>Exercice ${pos} sur ${s.liste.length}</span><b class="num" id="chronoMini">${hms(Date.now() - ec.debut)}</b></div>${animation(id)}
+    <h2 class="ex-title">${e.nom}</h2><p class="ex-meta num">${e.reps[0]} à ${e.reps[1]} rép.${e.par ? ' ' + e.par : ''} · repos ${e.repos >= 60 ? (e.repos / 60).toString().replace('.', ',') + ' min' : e.repos + ' s'}</p>
+    <div class="g-serie"><b class="num">Série ${n + 1}</b><span class="num"> sur ${tot}</span></div>
+    ${fait.length ? `<p class="g-faites num">${fait.map(x => (e.poidsCorps ? (x.kg ? '+' + fmt(x.kg) + ' kg × ' : '') : fmt(x.kg || 0) + ' kg × ') + x.reps).join(' · ')}</p>` : `<p class="g-faites">${prop.txt}</p>`}
+    <div class="g-champs"><label class="field"><input id="gKg" type="number" inputmode="decimal" step="0.5" min="0" placeholder="${e.poidsCorps ? '0' : '—'}" value="${z.kg}" aria-label="${e.poidsCorps ? 'Lest en kilos' : 'Kilos'}"><em>${e.poidsCorps ? 'lest' : 'kg'}</em></label>
+    <label class="field"><input id="gReps" type="number" inputmode="numeric" min="0" placeholder="${e.reps[1]}" value="${z.reps}" aria-label="Répétitions"><em>rép.</em></label></div>
+    <button class="btn btn-main g-ok" type="button" onclick="serieFaite()">Série faite</button>
+    <p class="g-apres">${n + 1 < tot ? 'Ensuite : repos, puis série ' + (n + 2) : apres ? 'Ensuite : ' + EX[apres].nom : 'Dernière série de la séance'}</p>
+    <details class="g-cours"><summary>Comment faire</summary><ol>${e.etapes.map((x, j) => `<li><b>${j + 1}</b><span>${x}</span></li>`).join('')}</ol><ul>${e.erreurs.map(x => `<li>${I.x}<span>${x}</span></li>`).join('')}</ul></details>
+    <button class="lien-annuler" type="button" onclick="sauter('${id}')">Sauter cet exercice (machine prise, douleur…)</button>`;
+  document.getElementById('sheetBody').innerHTML = h;
+  const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
+}
+function serieFaite() {
+  const e = EX[cur], sets = initLog(cur), tot = nbSeries(e), i = sets.findIndex((z, j) => j < tot && !z.ok); if (i < 0) return guide(cur);
+  const z = sets[i], kg = document.getElementById('gKg').value, reps = document.getElementById('gReps').value;
+  z.kg = kg; z.reps = reps || e.reps[1]; z.ok = true;
+  sets.forEach((x, j) => { if (j > i && !x.ok) x.kg = kg; });   // le poids suit sur les séries d'après
+  save(); if (navigator.vibrate) navigator.vibrate(20);
+  const ec = enCours(), reste = suivantDe(ec.k);
+  if (!reste) { document.getElementById('sheet').classList.remove('open'); return finSeance(ec.k); }
+  repos(reste === cur ? e.repos : Math.max(e.repos, 90)); guide(reste);
+}
 setInterval(() => { const ec = enCours(); if (!ec) return; document.querySelectorAll('#chrono,#chronoMini').forEach(n => n.textContent = hms(Date.now() - ec.debut)); }, 1000);
 function finSeance(k) {
   const log = jourLog(), faits = SEANCES[k].liste.filter(id => (log[id] || []).some(z => z.ok)).length;
@@ -648,7 +692,9 @@ function animation(id) {
 }
 // La fiche = le cours de l'exercice
 let cur = null;
+function initLog(id) { const e = EX[id], log = jourLog(), prop = propose(id); if (!log[id]) log[id] = Array.from({ length: nbSeries(e) }, () => ({ kg: e.poidsCorps ? (prop.kg || '') : prop.kg, reps: '', ok: false })); return log[id]; }
 function ouvrir(id) {
+  if (enCours()) return guide(id);
   cur = id; const e = EX[id], log = jourLog(), prop = propose(id), h0 = historique(id), last = h0[h0.length - 1];
   if (!log[id]) log[id] = Array.from({ length: nbSeries(e) }, () => ({ kg: e.poidsCorps ? (prop.kg || '') : prop.kg, reps: '', ok: false }));
   const yt = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.video);
@@ -726,7 +772,7 @@ function vueProgres() {
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
   recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
   h += `</section></div><div class="row" style="margin-top:16px"><button class="btn btn-ghost" type="button" onclick="exporter()">Sauvegarder</button><button class="btn btn-ghost" type="button" onclick="importer()">Restaurer</button></div>
-    <p class="aide">Version du 5 nov. 12h30 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
+    <p class="aide">Version du 5 nov. 12h45 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
 function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
