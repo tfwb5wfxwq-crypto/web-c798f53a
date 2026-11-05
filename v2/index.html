@@ -280,11 +280,14 @@ const EX = {
   curl:{nom:'Curl haltères',img:'Dumbbell_Bicep_Curl',series:3,reps:[10,12],repos:60,pas:2,depart:10,muscles:'Biceps',
     etapes:['Debout, un haltère par main','Coudes collés au corps','Monte en tournant la paume vers le haut','Descends en 2 secondes'],
     erreurs:['Balancer le dos','Monter les deux à toute vitesse'], video:'curl haltères biceps technique'},
+  laterales:{nom:'Élévations latérales',img:'Side_Lateral_Raise',series:3,reps:[12,15],repos:60,pas:1,depart:6,muscles:'Côté des épaules (la largeur)',
+    etapes:['Debout, un haltère léger dans chaque main le long du corps','Coudes très légèrement fléchis, buste droit','Monte les bras sur les côtés jusqu’à hauteur d’épaules, pas plus haut','Redescends en 2 secondes, sans laisser tomber'],
+    erreurs:['Trop lourd : on balance le buste pour monter','Hausser les épaules vers les oreilles'], video:'élévations latérales haltères technique'},
 };
 const SEANCES = {
   A:{nom:'Séance A',sous:'Tirage horizontal et biceps',duree:40,c:'var(--A)',liste:['rowingbarre','rowing1','curlbarre','marteau']},
   B:{nom:'Séance B',sous:'Tirage vertical et arrière d’épaule',duree:40,c:'var(--B)',liste:['tractions','pullover','oiseau','curlincline']},
-  C:{nom:'Séance C',sous:'Mix et bras',duree:35,c:'var(--C)',liste:['australiennes','rowing2','shrugs','curl']},
+  C:{nom:'Séance C',sous:'Mix, épaules et bras',duree:40,c:'var(--C)',liste:['australiennes','rowing2','laterales','shrugs','curl']},
 };
 const BOXE = [0, 1, 2, 4];   // lundi, mardi, mercredi, vendredi (circuit training le matin)
 const DEFAUT = { A:{j:1,h:'18:00'}, B:{j:3,h:'18:00'}, C:{j:5,h:'11:00'} };   // mardi, jeudi, samedi
@@ -498,7 +501,7 @@ function vueSeance() {
   const k = seanceVue, s = SEANCES[k], prevue = S.place[k].j === AUJ, log = jourLog();
   let h = `<header class="top"><div><h1>Séance</h1><p>${prevue ? 'Prévue aujourd’hui à ' + S.place[k].h : S.faites[k] ? 'Déjà faite cette semaine' : (S.place[k].j != null ? 'Prévue ' + NOMS[S.place[k].j] : 'Pas encore calée')}</p></div></header>
     <div class="choixS">${['A','B','C'].map(x => `<button type="button" class="${x === k ? 'on' : ''}" onclick="seanceVue='${x}';render()">${x}${S.faites[x] ? ' ✓' : ''}</button>`).join('')}</div>
-    <section class="card"><div class="sess" style="--c:${s.c}"><h2><i></i>${s.nom}</h2><p>${s.sous} · ${s.duree} min · échauffement 5 min au rameur avant</p></div>`;
+    <section class="card"><div class="sess" style="--c:${s.c}"><h2><i></i>${s.nom}</h2><p>${s.sous} · ${s.duree} min</p></div><p class="conseil"><b>Échauffement, 8 min :</b> 5 min de rameur tranquille, 10 grands cercles de bras dans chaque sens, puis 1 série légère du 1er exercice (moitié du poids × 10). Ensuite tu démarres.</p>`;
   if (LEGERE()) h += `<p class="conseil">Semaine légère : 2 séries par exercice au lieu de 3, mêmes poids. Ton corps encaisse les 5 semaines d’avant, c’est là que tu grossis.</p>`;
   s.liste.forEach(id => {
     const e = EX[id], sets = (log[id] || []), n = sets.filter(z => z.ok).length, ok = n >= nbSeries(e), prop = propose(id);
