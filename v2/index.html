@@ -395,7 +395,12 @@ function verdict(k, j, heure) {
     if (S.place[x].j === j) return { ok:false, t:'Déjà une séance ce jour-là', s:'Une seule séance par jour.' };
     if (Math.abs(S.place[x].j - j) === 1) return { ok:false, t:'Trop près de la séance ' + x, s:'Garde un jour de repos entre deux séances pour que le dos récupère.' };
   }
-  if (j === AUJ && min(h) < new Date().getHours() * 60 + new Date().getMinutes()) return { ok:false, t:'Cette heure est passée', s:'Choisis une heure plus tard aujourd’hui.' };
+  const maint = new Date().getHours() * 60 + new Date().getMinutes();
+  if (j === AUJ && min(h) < maint + 15) {   // heure passée aujourd'hui : on prend tout seul le prochain créneau libre
+    const prochain = creneaux(j).find(x => min(x) >= maint + 15) || (() => { const m = Math.ceil((maint + 30) / 30) * 30; return m <= 22 * 60 ? String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0') : null; })();
+    if (!prochain) return { ok:false, t:'Trop tard pour aujourd’hui', s:'Choisis un jour qui vient.' };
+    if (prochain !== h) { const v = verdict(k, j, prochain); return v.ok ? Object.assign(v, { heure: v.heure || prochain, s: 'Je la mets à ' + (v.heure || prochain) + ', c’est le prochain créneau libre. ' + v.s }) : v; }
+  }
   const conflit = rdv(j).find(a => Math.abs(min(a.h) - min(h)) < 60);
   if (conflit) return { ok:true, t:'Possible ' + NOMS[j], s:conflit.t + ' à ' + conflit.h + ' : je la décale à ' + plus(conflit.h, 90) + '.', heure:plus(conflit.h, 90) };
   return { ok:true, t:'Calé ' + NOMS[j] + ' à ' + h, s:BOXE.includes(j) ? 'Jour de boxe : le soir, c’est bon. Bois bien.' : 'Rappel le matin même.' };
@@ -431,7 +436,7 @@ function vueSemaine() {
 
 // Panneau jour + heure
 let choix = null, ouvertA = 0;
-function creneaux(j) { const pris = rdv(j).map(a => min(a.h)); return ['07:00','12:30','14:00','17:00','18:30','20:00'].filter(h => pris.every(p => Math.abs(p - min(h)) >= 75)).slice(0, 4); }
+function creneaux(j) { const pris = rdv(j).map(a => min(a.h)), maint = j === AUJ ? new Date().getHours() * 60 + new Date().getMinutes() + 15 : 0; return ['07:00','09:00','12:30','14:00','17:00','18:30','20:00'].filter(h => min(h) >= maint && pris.every(p => Math.abs(p - min(h)) >= 75)).slice(0, 4); }
 function ouvrirPanneau(k) { const p = semaine().place[k]; choix = { k, j: p.j, h: p.h }; ouvertA = Date.now(); dessinerPanneau(); document.getElementById('voile').classList.add('show'); document.getElementById('panneau').classList.add('show'); }
 function fermerPanneau() { document.getElementById('voile').classList.remove('show'); document.getElementById('panneau').classList.remove('show'); }
 function dessinerPanneau() {
