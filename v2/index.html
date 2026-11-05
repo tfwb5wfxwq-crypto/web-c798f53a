@@ -94,8 +94,14 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 .sess h2 i{width:12px;height:12px;border-radius:3px;background:var(--c);flex:none}
 .sess p{color:var(--t2);font-size:15px;margin-top:4px}
 .choixS{display:flex;gap:8px;margin-bottom:12px}
-.choixS button{flex:1;height:44px;border-radius:12px;border:1px solid var(--hair2);font-weight:600;background:var(--s1)}
+.choixS button{flex:1;height:56px;border-radius:12px;border:1px solid var(--hair2);background:var(--s1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--t3)}
+.choixS button b{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:22px;line-height:1}
+.choixS button small{font-size:12px;font-weight:500}
+.choixS button.jour{color:var(--t1);border-color:var(--t1)}
+.choixS button.jour small{font-weight:600}
 .choixS button.on{background:var(--t1);border-color:var(--t1);color:#fff}
+.choixS button.faite:not(.on){opacity:.6}
+.retour-jour{display:block;width:100%;margin:-4px 0 12px;padding:10px;border-radius:10px;background:var(--s2);font-weight:600;font-size:14px;color:var(--t1)}
 .ex{display:flex;align-items:center;gap:14px;padding:12px 16px;width:100%;text-align:left;border-top:1px solid var(--hair)}
 .ex:active{background:var(--s2)}
 .ex .thumb{width:64px;height:48px;border-radius:8px;object-fit:cover;background:var(--s3);flex:none}
@@ -149,6 +155,18 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 .g-cours summary{padding:12px 0;font-weight:600;cursor:pointer}
 .g-cours ol,.g-cours ul{list-style:none;padding:0 0 12px;display:grid;gap:8px;font-size:15px}
 .g-cours li{display:flex;gap:8px}
+.r-centre{text-align:center;padding:40px 0 28px}
+.r-temps{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:96px;line-height:1}
+.r-temps.ding{color:var(--ok)}
+.r-etat{color:var(--t2);margin-top:8px}
+.r-plus{display:flex;gap:8px;justify-content:center;margin-top:16px}
+.r-plus button{height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--hair2);background:var(--s1);font-weight:600;font-size:15px}
+.r-next{margin-bottom:16px}
+.r-next p{color:var(--t3);font-size:14px;margin-bottom:8px}
+.r-carte{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--hair);border-radius:12px;background:var(--s1)}
+.r-carte img{width:64px;height:64px;border-radius:8px;object-fit:cover;background:var(--s3)}
+.r-carte strong{display:block;font-weight:600}
+.r-carte small{color:var(--t2);font-size:14px}
 .lien-annuler{display:block;margin:12px auto 4px;background:none;border:0;color:var(--t3);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:3px;padding:8px}
 .anim.photos{aspect-ratio:4/5;background:#F7F6F3}
 .anim.photos img{object-fit:contain;opacity:0;animation:none}
@@ -541,7 +559,10 @@ function vueSeance() {
   const S = semaine(); const autre = enCours(); if (autre) seanceVue = autre.k; if (!seanceVue) seanceVue = seanceDuJour();
   const k = seanceVue, s = SEANCES[k], prevue = S.place[k].j === AUJ, log = jourLog(), ec = enCours(k), suiv = ec ? suivantDe(k) : null;
   let h = `<header class="top"><div><h1>Séance</h1><p>${ec ? 'En cours' : prevue ? 'Prévue aujourd’hui à ' + S.place[k].h : S.faites[k] ? 'Déjà faite cette semaine' : (S.place[k].j != null ? 'Prévue ' + NOMS[S.place[k].j] : 'Pas encore calée')}</p></div></header>`;
-  if (!ec) h += `<div class="choixS">${['A','B','C'].map(x => `<button type="button" class="${x === k ? 'on' : ''}" onclick="seanceVue='${x}';render()">${x}${S.faites[x] ? ' ✓' : ''}</button>`).join('')}</div>`;
+  if (!ec) { const jour = Object.keys(S.place).find(x => S.place[x].j === AUJ && !S.faites[x]);
+    const etat = x => S.faites[x] ? 'faite ✓' : S.place[x].j === AUJ ? 'aujourd’hui' : S.place[x].j != null ? NOMS[S.place[x].j] : 'à caler';
+    h += `<div class="choixS">${['A','B','C'].map(x => `<button type="button" class="${x === k ? 'on' : ''}${x === jour ? ' jour' : ''}${S.faites[x] ? ' faite' : ''}" onclick="seanceVue='${x}';render()"><b>${x}</b><small>${etat(x)}</small></button>`).join('')}</div>`;
+    if (jour && k !== jour) h += `<button class="retour-jour" type="button" onclick="seanceVue='${jour}';render()">Ta séance du jour, c’est la ${jour} →</button>`; }
   h += `<section class="card" style="--c:${s.c}"><div class="sess"><h2><i></i>${s.nom}</h2><p>${s.sous} · ${s.duree} min</p></div>`;
   if (ec) h += `<div class="encours"><div><div class="chrono" id="chrono">${hms(Date.now() - ec.debut)}</div><small>${suiv ? 'Exercice ' + (s.liste.indexOf(suiv) + 1) + ' sur ' + s.liste.length + ' : ' + EX[suiv].nom : 'Tout est fait'}</small></div>${suiv ? `<button class="stop" type="button" onclick="ouvrir('${suiv}')">Reprendre</button>` : `<button class="stop" type="button" onclick="finSeance('${k}')">Terminer</button>`}</div>`;
   else h += `<p class="conseil" style="margin:0 16px 12px"><b>Échauffement, 8 min :</b> 5 min de rameur tranquille, 10 grands cercles de bras dans chaque sens, puis 1 série légère du 1er exercice (moitié du poids × 10).</p>`;
@@ -586,7 +607,26 @@ function serieFaite() {
   save(); if (navigator.vibrate) navigator.vibrate(20);
   const ec = enCours(), reste = suivantDe(ec.k);
   if (!reste) { document.getElementById('sheet').classList.remove('open'); return finSeance(ec.k); }
-  repos(reste === cur ? e.repos : Math.max(e.repos, 90)); guide(reste);
+  pageRepos(reste === cur ? e.repos : Math.max(e.repos, 90), reste);
+}
+// Page de repos entre deux séries ou deux exercices : rien ne démarre tant que tu n'appuies pas
+let tRepos = null;
+function pageRepos(sec, id) {
+  const ec = enCours(), s = SEANCES[ec.k], e = EX[id], meme = id === cur, sets = initLog(id), n = sets.findIndex((z, j) => j < nbSeries(e) && !z.ok) + 1;
+  try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } catch (x) {}
+  document.getElementById('sheetBody').innerHTML = `<div class="g-haut"><button class="iconbtn" type="button" onclick="clearInterval(tRepos);fermer()" aria-label="Réduire">${I.down}</button><span>Repos</span><b class="num" id="chronoMini">${hms(Date.now() - ec.debut)}</b></div>
+    <div class="r-centre"><div class="r-temps num" id="rTemps"></div><p class="r-etat" id="rEtat">Souffle, bois une gorgée</p>
+    <div class="r-plus"><button type="button" onclick="rAjout(-15)">−15 s</button><button type="button" onclick="rAjout(30)">+30 s</button></div></div>
+    <div class="r-next"><p>${meme ? 'Ensuite' : 'Exercice suivant · ' + (s.liste.indexOf(id) + 1) + ' sur ' + s.liste.length}</p><div class="r-carte"><img src="${vignette(id)}" alt=""><div><strong>${e.nom}</strong><small class="num">Série ${n} sur ${nbSeries(e)} · ${e.reps[0]} à ${e.reps[1]} rép.</small></div></div></div>
+    <button class="btn btn-main g-ok" type="button" onclick="clearInterval(tRepos);guide('${id}')">${meme ? 'C’est parti, série ' + n : 'C’est parti'}</button>`;
+  const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
+  let fini = false; window.rFin = Date.now() + sec * 1000;
+  const maj = () => { const el = document.getElementById('rTemps'); if (!el) return clearInterval(tRepos); const r = Math.max(0, Math.ceil((window.rFin - Date.now()) / 1000));
+    el.textContent = Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0');
+    if (!r && !fini) { fini = true; sonner(); el.classList.add('ding'); document.getElementById('rEtat').textContent = 'C’est l’heure, quand tu es prêt'; }
+    else if (r) { fini = false; el.classList.remove('ding'); document.getElementById('rEtat').textContent = 'Souffle, bois une gorgée'; } };
+  window.rAjout = d => { window.rFin = Math.max(Date.now(), window.rFin + d * 1000); maj(); };
+  clearInterval(tRepos); maj(); tRepos = setInterval(maj, 250);
 }
 setInterval(() => { const ec = enCours(); if (!ec) return; document.querySelectorAll('#chrono,#chronoMini').forEach(n => n.textContent = hms(Date.now() - ec.debut)); }, 1000);
 function finSeance(k) {
@@ -772,7 +812,7 @@ function vueProgres() {
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
   recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
   h += `</section></div><div class="row" style="margin-top:16px"><button class="btn btn-ghost" type="button" onclick="exporter()">Sauvegarder</button><button class="btn btn-ghost" type="button" onclick="importer()">Restaurer</button></div>
-    <p class="aide">Version du 5 nov. 12h45 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
+    <p class="aide">Version du 5 nov. 12h35 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
 function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
