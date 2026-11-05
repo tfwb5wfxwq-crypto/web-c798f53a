@@ -459,7 +459,9 @@ function verdict(k, j, heure) {
     if (!prochain) return { ok:false, t:'Trop tard pour aujourd’hui', s:'Choisis un jour qui vient.' };
     if (prochain !== h) { const v = verdict(k, j, prochain); return v.ok ? Object.assign(v, { heure: v.heure || prochain, s: 'Je la mets à ' + (v.heure || prochain) + ', c’est le prochain créneau libre. ' + v.s }) : v; }
   }
-  const conflit = rdv(j).find(a => Math.abs(min(a.h) - min(h)) < 60);
+  const pris = rdv(j).find(a => a.occupe && bloque(a, h));
+  if (pris) { const cr = creneaux(j), libre = cr.find(x => min(x) >= min(pris.f) + 30) || cr[cr.length - 1]; return libre ? { ok:true, t:'Possible ' + NOMS[j], s:'Tu as « ' + pris.t + ' » de ' + pris.h + ' à ' + pris.f + ' : je la mets à ' + libre + '.', heure:libre } : { ok:false, t:NOMS[j] + ' est pris', s:'« ' + pris.t + ' » de ' + pris.h + ' à ' + pris.f + '. Choisis un autre jour.' }; }
+  const conflit = rdv(j).find(a => !a.occupe && Math.abs(min(a.h) - min(h)) < 60);
   if (conflit) return { ok:true, t:'Possible ' + NOMS[j], s:conflit.t + ' à ' + conflit.h + ' : je la décale à ' + plus(conflit.h, 90) + '.', heure:plus(conflit.h, 90) };
   return { ok:true, t:'Calé ' + NOMS[j] + ' à ' + h, s:BOXE.includes(j) ? 'Jour de boxe : le soir, c’est bon. Bois bien.' : 'Rappel le matin même.' };
 }
@@ -476,7 +478,7 @@ function vueSemaine() {
     <section class="card jauge"><div class="l1"><strong class="num">${faites} séance${faites > 1 ? 's' : ''} sur 3</strong><small>${(() => { const cal = restantes.filter(k => S.place[k].j != null).length; return !restantes.length ? 'Semaine complète, bravo' : cal === restantes.length ? restantes.length + ' à faire, déjà calée' + (cal > 1 ? 's' : '') : cal + ' calée' + (cal > 1 ? 's' : '') + ' d’ici samedi'; })()}</small></div>
     <div class="barres">${['A','B','C'].map(k => `<span class="${S.faites[k] ? 'fait' : (S.place[k].j != null ? 'cale' : '')}"></span>`).join('')}</div></section><section class="jours">`;
   for (let i = 0; i < 7; i++) {
-    const ici = Object.keys(S.place).filter(k => S.place[k].j === i), l = rdv(i), d = dateJ(i);
+    const ici = Object.keys(S.place).filter(k => S.place[k].j === i), l = rdv(i).filter(a => !a.occupe), d = dateJ(i);
     h += `<div class="jour${i < AUJ ? ' passe' : ''}${i === AUJ ? ' auj' : ''}" data-j="${i}"><div class="date"><b>${JOURS[i]}</b><strong class="num">${d.getDate()}</strong></div><div class="contenu">`;
     l.forEach(a => h += `<div class="ligne${a.boxe ? ' boxe' : ''}"><span class="h num">${a.h}</span>${a.boxe ? '<i></i>' : ''}<span class="t">${a.t}</span></div>`);
     ici.forEach(k => { const s = SEANCES[k], p = S.place[k], f = S.faites[k];
@@ -494,7 +496,8 @@ function vueSemaine() {
 
 // Panneau jour + heure
 let choix = null, ouvertA = 0;
-function creneaux(j) { const pris = rdv(j).map(a => min(a.h)), maint = j === AUJ ? new Date().getHours() * 60 + new Date().getMinutes() + 15 : 0; return ['07:00','09:00','12:30','14:00','17:00','18:30','20:00'].filter(h => min(h) >= maint && pris.every(p => Math.abs(p - min(h)) >= 75)).slice(0, 4); }
+const bloque = (a, h) => { const s = min(a.h), e = a.f ? min(a.f) : s + 60, x = min(h); return x + 60 > s - 30 && x < e + 30; };   // séance d'1 h + 30 min de trajet de chaque côté
+function creneaux(j) { const l = rdv(j), maint = j === AUJ ? new Date().getHours() * 60 + new Date().getMinutes() + 15 : 0; return ['07:00','09:00','12:30','14:00','17:00','18:30','20:00'].filter(h => min(h) >= maint && !l.some(a => bloque(a, h))).slice(0, 4); }
 function ouvrirPanneau(k) { const p = semaine().place[k]; choix = { k, j: p.j, h: p.h }; ouvertA = Date.now(); dessinerPanneau(); document.getElementById('voile').classList.add('show'); document.getElementById('panneau').classList.add('show'); }
 function fermerPanneau() { document.getElementById('voile').classList.remove('show'); document.getElementById('panneau').classList.remove('show'); }
 function dessinerPanneau() {
@@ -829,7 +832,7 @@ function vueProgres() {
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
   recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
   h += `</section></div><p class="vide" style="text-align:left;margin-top:16px">${SYNC ? 'Sauvegarde automatique : chaque série part sur le Mac Mini (copie de chaque jour gardée 3 mois) et une copie part chaque lundi sur GitHub. Tu n’as rien à faire.' : 'Pas encore relié au robot, donc pas de sauvegarde automatique.'}</p>
-    <p class="aide">Version 2.8 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
+    <p class="aide">Version 2.9 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
 function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
