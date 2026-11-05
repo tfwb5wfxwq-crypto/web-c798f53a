@@ -4,23 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#0E0F11">
+<meta name="theme-color" content="#F5F4F1">
 <title>Muscu · Ma semaine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0E0F11; --s1:#16181B; --s2:#1E2125; --s3:#272A2F;
-  --hair:rgba(242,240,236,.08); --hair2:rgba(242,240,236,.14);
-  --t1:#F2F0EC; --t2:#B3AFA7; --t3:#87837C;
-  --gant:#E8493C; --gant-ink:#FF6B5E; --ok:#7FCB8F; --warn:#F2B33D;
-  --A:#E8493C; --B:#5B9DF0; --C:#B58CF0;
+  --bg:#F5F4F1; --s1:#FFFFFF; --s2:#FBFAF8; --s3:#ECEAE5;
+  --hair:rgba(20,18,15,.08); --hair2:rgba(20,18,15,.14);
+  --t1:#16140F; --t2:#5B564E; --t3:#837D74;
+  --gant:#D43A2D; --gant-ink:#C2321F; --ok:#2E8F4B; --warn:#B87800; --ko:#D43A2D;
+  --A:#D43A2D; --B:#2F6BD0; --C:#7A52CC;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
 body{font-family:'Barlow',system-ui,sans-serif;background:var(--bg);color:var(--t1);font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased;min-height:100dvh;-webkit-user-select:none;user-select:none}
-::selection{background:rgba(232,73,60,.35)}
+::selection{background:rgba(212,58,45,.2)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 :focus-visible{outline:2px solid var(--gant-ink);outline-offset:2px;border-radius:8px}
 .num{font-variant-numeric:tabular-nums}
@@ -42,15 +42,15 @@ svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;st
 .barres{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .barres span{height:8px;border-radius:4px;background:var(--s3)}
 .barres span.fait{background:var(--ok)}
-.barres span.cale{background:repeating-linear-gradient(90deg,var(--s3) 0 6px,rgba(242,240,236,.22) 6px 12px)}
+.barres span.cale{background:repeating-linear-gradient(90deg,var(--s3) 0 6px,rgba(20,18,15,.14) 6px 12px)}
 
 /* Jours */
 .jours{display:flex;flex-direction:column;gap:8px}
 .jour{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:12px;border-radius:16px;background:var(--s1);border:1px solid var(--hair);min-height:72px;transition:border-color .15s,background-color .15s}
 .jour.passe{opacity:.55}
-.jour.auj{border-color:var(--hair2);background:var(--s2)}
-.jour.cible-ok{border-color:var(--ok);background:rgba(127,203,143,.08)}
-.jour.cible-ko{border-color:var(--warn);background:rgba(242,179,61,.08)}
+.jour.auj{border-color:rgba(212,58,45,.35);box-shadow:0 2px 10px rgba(20,18,15,.05)}
+.jour.cible-ok{border-color:var(--ok);background:#EEF7F0}
+.jour.cible-ko{border-color:var(--ko);background:#FCEDEB}
 .date{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:2px}
 .date b{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--t3)}
 .date strong{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;line-height:1.05}
@@ -64,28 +64,52 @@ svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;st
 .libre{font-size:14px;color:var(--t3)}
 
 /* Séance : la pastille qu'on glisse */
-.seance{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--s3);border:1px solid var(--hair2);touch-action:none;cursor:grab;position:relative}
+.seance{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--s2);border:1px solid var(--hair2);touch-action:none;cursor:grab;position:relative;-webkit-touch-callout:none;-webkit-user-select:none}
 .seance::before{content:"";width:4px;align-self:stretch;border-radius:2px;background:var(--c)}
 .seance .nom{font-weight:600;line-height:1.2}
 .seance .sous{font-size:13px;color:var(--t2)}
 .seance .txt{flex:1;min-width:0}
 .seance .grip{color:var(--t3)}
-.seance.faite{cursor:default;background:var(--s2)}
+.seance.faite{cursor:default;background:var(--bg)}
 .seance.faite .nom{color:var(--t2)}
 .seance.faite .grip{color:var(--ok)}
-.seance.fantome{position:fixed;z-index:50;pointer-events:none;box-shadow:0 16px 36px rgba(0,0,0,.5);transform:rotate(-1.5deg) scale(1.03)}
+.seance.fantome{position:fixed;z-index:50;pointer-events:none;background:#fff;box-shadow:0 14px 32px rgba(20,18,15,.18);transform:rotate(-1.5deg) scale(1.03)}
 .seance.origine{opacity:.25}
 
 .aide{color:var(--t3);font-size:13px;text-align:center;margin-top:16px}
 
 /* Message de l'agent */
-.toast{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);max-width:536px;margin:0 auto;z-index:60;background:var(--s2);border:1px solid var(--hair2);border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 12px 32px rgba(0,0,0,.45);transform:translateY(calc(100% + 24px));visibility:hidden;transition:transform .3s cubic-bezier(.22,1,.36,1),visibility 0s .3s}
+.toast{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);max-width:536px;margin:0 auto;z-index:60;background:var(--s1);border:1px solid var(--hair2);border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 12px 28px rgba(20,18,15,.14);transform:translateY(calc(100% + 24px));visibility:hidden;transition:transform .3s cubic-bezier(.22,1,.36,1),visibility 0s .3s}
 .toast.show{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.22,1,.36,1)}
 .toast .ic{margin-top:2px}
 .toast.ok .ic{color:var(--ok)}
-.toast.ko .ic{color:var(--warn)}
+.toast.ko .ic{color:var(--ko)}
 .toast strong{display:block;font-weight:600}
 .toast small{color:var(--t2);font-size:14px}
+.voile{position:fixed;inset:0;background:rgba(20,18,15,.28);z-index:70;opacity:0;visibility:hidden;transition:opacity .2s,visibility 0s .2s}
+.voile.show{opacity:1;visibility:visible;transition:opacity .2s}
+.panneau{position:fixed;left:0;right:0;bottom:0;z-index:80;background:var(--s1);border-radius:22px 22px 0 0;padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 16px);max-width:560px;margin:0 auto;transform:translateY(105%);transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 -8px 30px rgba(20,18,15,.12)}
+.panneau.show{transform:none}
+.poignee{width:40px;height:5px;border-radius:3px;background:var(--s3);margin:0 auto 14px}
+.panneau h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:26px;line-height:1.1}
+.panneau .sous{color:var(--t2);font-size:14px;margin:2px 0 16px}
+.panneau h3{font-size:14px;font-weight:600;color:var(--t2);margin:0 0 8px}
+.choix{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:18px}
+.choix button{height:56px;border-radius:12px;border:1px solid var(--hair2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-variant-numeric:tabular-nums}
+.choix button b{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--t3);letter-spacing:.04em}
+.choix button span{font-weight:600;font-size:17px}
+.choix button.ko{background:var(--bg);color:var(--t3);border-color:transparent}
+.choix button.ko span{text-decoration:line-through;text-decoration-color:var(--ko);text-decoration-thickness:2px}
+.choix button.sel{background:var(--t1);border-color:var(--t1);color:#fff}
+.choix button.sel b{color:rgba(255,255,255,.7)}
+.heures{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.heures button{height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--hair2);font-weight:600;font-variant-numeric:tabular-nums}
+.heures button.sel{background:var(--t1);border-color:var(--t1);color:#fff}
+.heures input{height:44px;border-radius:12px;border:1px solid var(--hair2);padding:0 10px;font:inherit;font-weight:600;background:var(--s1);color:var(--t1)}
+.avis{font-size:14px;padding:10px 12px;border-radius:12px;margin-bottom:14px;background:#EEF7F0;color:#1F5E33}
+.avis.ko{background:#FCEDEB;color:#8E2219}
+.go{width:100%;height:52px;border-radius:14px;background:var(--t1);color:#fff;font-weight:600;font-size:16px}
+.go:disabled{background:var(--s3);color:var(--t3)}
 </style>
 </head>
 <body>
@@ -99,8 +123,10 @@ svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;st
     <div class="barres" id="barres"></div>
   </section>
   <section class="jours" id="jours"></section>
-  <p class="aide">Maintiens une séance et glisse-la sur un autre jour</p>
+  <p class="aide">Touche une séance pour changer le jour ou l’heure, ou maintiens-la et glisse-la</p>
 </main>
+<div class="voile" id="voile" onclick="if (Date.now() - ouvertA > 450) fermer()"></div>
+<section class="panneau" id="panneau" role="dialog" aria-label="Déplacer la séance"></section>
 <div class="toast" id="toast" role="status" aria-live="polite"><svg class="ic" viewBox="0 0 24 24" id="toastIc"></svg><div><strong id="toastT"></strong><small id="toastS"></small></div></div>
 
 <script>
@@ -123,7 +149,7 @@ const SEANCES = {
   C:{nom:'Séance C',sous:'Mix et bras · 35 min',c:'var(--C)'},
 };
 // où est chaque séance, à quelle heure, et si elle est faite
-const place = { A:{j:1,h:'18:00',faite:true}, B:{j:3,h:'18:30',faite:false}, C:{j:5,h:'11:00',faite:false} };
+const place = { A:{j:1,h:'18:00',faite:true}, B:{j:3,h:'18:30',faite:false}, C:{j:5,h:'11:00',faite:false} };   // exemple
 
 const I = {
   grip:'<svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></svg>',
@@ -157,14 +183,15 @@ function render() {
 }
 
 // Règles de l'agent : pas 2 séances 2 jours de suite, pas dans le passé, pas en même temps qu'un rendez-vous
-function verdict(k, j) {
+function verdict(k, j, heure) {
   if (j < AUJ) return { ok:false, t:'Ce jour est passé', s:'Choisis aujourd’hui ou un jour qui vient.' };
+  if (j === 6) return { ok:false, t:'Le dimanche, c’est repos', s:'Ta règle : jamais de séance le dimanche.' };
   for (const x of Object.keys(place)) {
     if (x === k) continue;
     if (Math.abs(place[x].j - j) === 0) return { ok:false, t:'Déjà une séance ce jour-là', s:'Une seule séance par jour.' };
     if (Math.abs(place[x].j - j) === 1) return { ok:false, t:'Trop près de la séance ' + x, s:'Garde un jour de repos entre deux séances pour que le dos récupère.' };
   }
-  const h = place[k].h, conflit = semaine[j].agenda.find(a => Math.abs(min(a.h) - min(h)) < 60);
+  const h = heure || place[k].h, conflit = semaine[j].agenda.find(a => Math.abs(min(a.h) - min(h)) < 60);
   if (conflit) return { ok:true, t:'Calé ' + NOMS[j], s:'Attention, ' + conflit.t.toLowerCase() + ' à ' + conflit.h + ' : je propose de la décaler à ' + plus(conflit.h, 90) + '.' , heure:plus(conflit.h, 90) };
   if (semaine[j].boxe) return { ok:true, t:'Calé ' + NOMS[j] + ' à ' + h, s:'Jour de boxe : en fin de journée, c’est bon. Hydrate-toi bien.' };
   return { ok:true, t:'Calé ' + NOMS[j] + ' à ' + h, s:'Je le mets dans ton agenda et je te le rappelle le matin.' };
@@ -181,28 +208,71 @@ function toast(v) {
   clearTimeout(tT); tT = setTimeout(() => t.classList.remove('show'), 4200);
 }
 
-// Glisser-déposer au doigt (pointer events, marche sur iPhone)
+// ===== Changer le jour ou l'heure : appui court = panneau, appui long = glisser =====
+let choix = null;
+function creneaux(j) {   // créneaux libres de 1 h entre les rendez-vous, après la boxe du matin
+  const pris = semaine[j].agenda.map(a => min(a.h)).concat(semaine[j].boxe ? [min('11:20')] : []);
+  return ['07:00','12:30','14:00','17:00','18:30','20:00'].filter(h => pris.every(p => Math.abs(p - min(h)) >= 75)).slice(0, 4);
+}
+let ouvertA = 0;
+function ouvrir(k) {
+  ouvertA = Date.now();
+  choix = { k, j: place[k].j, h: place[k].h };
+  dessiner(); document.getElementById('voile').classList.add('show'); document.getElementById('panneau').classList.add('show');
+}
+function fermer() { document.getElementById('voile').classList.remove('show'); document.getElementById('panneau').classList.remove('show'); }
+function dessiner() {
+  const k = choix.k, s = SEANCES[k];
+  const v = verdict(k, choix.j, choix.h);
+  const libres = creneaux(choix.j);
+  let h = `<div class="poignee"></div><h2>${s.nom}</h2><p class="sous">${s.sous}</p><h3>Le jour</h3><div class="choix">`;
+  semaine.forEach((d, i) => { const ok = verdict(k, i, choix.h).ok;
+    h += `<button type="button" class="${i === choix.j ? 'sel' : ''}${ok ? '' : ' ko'}" onclick="choix.j=${i};dessiner()" aria-label="${NOMS[i]} ${d.n}${ok ? '' : ', déconseillé'}"><b>${JOURS[i]}</b><span>${d.n}</span></button>`; });
+  h += `</div><h3>L’heure · créneaux libres dans ton agenda</h3><div class="heures">`;
+  libres.forEach(x => h += `<button type="button" class="${x === choix.h ? 'sel' : ''}" onclick="choix.h='${x}';dessiner()">${x}</button>`);
+  h += `<input type="time" value="${choix.h}" aria-label="Autre heure" onchange="choix.h=this.value;dessiner()"></div>`;
+  h += `<p class="avis${v.ok ? '' : ' ko'}"><strong>${v.t}.</strong> ${v.s}</p>`;
+  h += `<button type="button" class="go" ${v.ok ? '' : 'disabled'} onclick="valider()">${v.ok ? 'Caler ' + NOMS[choix.j] + ' à ' + (v.heure || choix.h) : 'Choisis un autre jour'}</button>`;
+  document.getElementById('panneau').innerHTML = h;
+}
+function valider() {
+  const v = verdict(choix.k, choix.j, choix.h); if (!v.ok) return;
+  place[choix.k].j = choix.j; place[choix.k].h = v.heure || choix.h;
+  fermer(); render(); toast({ ok: true, t: 'Calé ' + NOMS[choix.j] + ' à ' + place[choix.k].h, s: 'Dans la vraie appli : ajouté à ton agenda, rappel le matin.' });
+}
+
+// Glisser au doigt : appui long, défilement auto près des bords, rouge si refusé
 function brancher() {
   document.querySelectorAll('.seance:not(.faite)').forEach(el => {
     el.addEventListener('pointerdown', e => {
-      const k = el.dataset.s, r = el.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
-      let fantome = null, cible = null, appui = setTimeout(demarrer, 180);
+      const k = el.dataset.s, r = el.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top, x0 = e.clientX, y0 = e.clientY;
+      let fantome = null, cible = null, pos = e, defile = null;
+      try { el.setPointerCapture(e.pointerId); } catch (er) {}
+      const appui = setTimeout(demarrer, 220);
       function demarrer() {
         fantome = el.cloneNode(true); fantome.classList.add('fantome'); fantome.style.width = r.width + 'px';
-        document.body.appendChild(fantome); el.classList.add('origine'); bouger(e);
+        document.body.appendChild(fantome); el.classList.add('origine'); bouger(pos);
         if (navigator.vibrate) navigator.vibrate(12);
+        defile = setInterval(() => {   // fait défiler la page quand le doigt est près du haut ou du bas
+          const y = pos.clientY, H = innerHeight;
+          if (y > H - 90) scrollBy(0, 14); else if (y < 90) scrollBy(0, -14); else return;
+          bouger(pos);
+        }, 16);
       }
       function bouger(ev) {
-        if (!fantome) return;
+        pos = ev;
+        if (!fantome) { if (Math.hypot(ev.clientX - x0, ev.clientY - y0) > 10) annuler(); return; }
         fantome.style.left = (ev.clientX - dx) + 'px'; fantome.style.top = (ev.clientY - dy) + 'px';
         const sous = document.elementsFromPoint(ev.clientX, ev.clientY).find(n => n.classList && n.classList.contains('jour'));
         document.querySelectorAll('.jour').forEach(n => n.classList.remove('cible-ok', 'cible-ko'));
         cible = sous ? +sous.dataset.j : null;
-        if (sous) sous.classList.add(verdict(k, cible).ok ? 'cible-ok' : 'cible-ko');
+        if (sous && cible !== place[k].j) sous.classList.add(verdict(k, cible).ok ? 'cible-ok' : 'cible-ko');
       }
-      function fin() {
-        clearTimeout(appui); window.removeEventListener('pointermove', bouger); window.removeEventListener('pointerup', fin);
-        if (!fantome) return;
+      function annuler() { clearTimeout(appui); nettoyer(); }
+      function nettoyer() { el.removeEventListener('pointermove', bouger); el.removeEventListener('pointerup', fin); el.removeEventListener('pointercancel', fin); clearInterval(defile); }
+      function fin(ev) {
+        clearTimeout(appui); nettoyer();
+        if (!fantome) { if (ev.type === 'pointerup' && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 10) ouvrir(k); return; }
         fantome.remove(); el.classList.remove('origine');
         if (cible != null && cible !== place[k].j) {
           const v = verdict(k, cible); toast(v);
@@ -210,7 +280,7 @@ function brancher() {
         }
         render();
       }
-      window.addEventListener('pointermove', bouger); window.addEventListener('pointerup', fin);
+      el.addEventListener('pointermove', bouger); el.addEventListener('pointerup', fin); el.addEventListener('pointercancel', fin);
     });
   });
 }
