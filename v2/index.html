@@ -289,7 +289,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 <div class="toast" id="toast" role="status" aria-live="polite"><svg class="ic" viewBox="0 0 24 24" id="toastIc"></svg><div><strong id="toastT"></strong><small id="toastS"></small></div></div>
 
 <script src="agenda.js"></script>
-<script>window.VIDEOS = {rowingbarre:1,rowing1:1,curlbarre:1,marteau:1,tractions:1,pullover:1,oiseau:1,curlincline:1,australiennes:1,rowing2:1,shrugs:1,laterales:1,curl:1};
+<script>window.VIDEOS = {};
 window.PHOTOS = {rowingbarre:8,rowing1:8,curlbarre:8,marteau:8,tractions:8,pullover:8,oiseau:8,curlincline:8,australiennes:8,rowing2:8,shrugs:8,curl:8,laterales:8};</script>
 <script>
 // ============ Le programme ============
@@ -824,8 +824,8 @@ function vueProgres() {
   const recs = Object.keys(EX).map(id => { let best = null; Object.keys(D.log).forEach(d => (D.log[d][id] || []).filter(s => s.ok).forEach(s => { const v = EX[id].poidsCorps ? Number(s.reps) + (Number(s.kg) || 0) / 100 : Number(s.kg); if (v && (!best || v > best.v)) best = { v, d, reps: s.reps, kg: Number(s.kg) || 0 }; })); return best ? { id, best } : null; }).filter(Boolean);
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
   recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
-  h += `</section></div><div class="row" style="margin-top:16px"><button class="btn btn-ghost" type="button" onclick="exporter()">Sauvegarder</button><button class="btn btn-ghost" type="button" onclick="importer()">Restaurer</button></div>
-    <p class="aide">Version du 5 nov. 13h15 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
+  h += `</section></div><p class="vide" style="text-align:left;margin-top:16px">${SYNC ? 'Sauvegarde automatique : chaque série part sur le Mac Mini (copie de chaque jour gardée 3 mois) et une copie part chaque lundi sur GitHub. Tu n’as rien à faire.' : 'Pas encore relié au robot, donc pas de sauvegarde automatique.'}</p><button class="lien-annuler" type="button" onclick="importer()">Restaurer une ancienne sauvegarde</button>
+    <p class="aide">Version du 5 nov. 14h50 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
 function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
