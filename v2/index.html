@@ -549,6 +549,10 @@ function brancher() {
 }
 
 // ============ Séance du jour ============
+const ECHAUF = {   // dernière étape de l'échauffement, selon le 1er exercice de la séance
+  tractions: '30 s suspendu à la barre bras tendus, puis 3 tractions faciles (ou 3 descentes lentes si tu n’y arrives pas encore)',
+  australiennes: '1 série de 8 tractions australiennes avec le corps plus droit, pieds plus près (c’est plus facile)',
+};
 const LEGERE = () => estLegere(numSemaine(SEM));
 const nbSeries = e => LEGERE() ? Math.min(2, e.series) : e.series;
 function seanceDuJour() { const S = semaine(); return Object.keys(S.place).find(k => S.place[k].j === AUJ) || ['A','B','C'].find(k => !S.faites[k]) || 'A'; }
@@ -566,7 +570,7 @@ function vueSeance() {
     if (jour && k !== jour) h += `<button class="retour-jour" type="button" onclick="seanceVue='${jour}';render()">Ta séance du jour, c’est la ${jour} →</button>`; }
   h += `<section class="card" style="--c:${s.c}"><div class="sess"><h2><i></i>${s.nom}</h2><p>${s.sous} · ${s.duree} min</p></div>`;
   if (ec) h += `<div class="encours"><div><div class="chrono" id="chrono">${hms(Date.now() - ec.debut)}</div><small>${suiv ? 'Exercice ' + (s.liste.indexOf(suiv) + 1) + ' sur ' + s.liste.length + ' : ' + EX[suiv].nom : 'Tout est fait'}</small></div>${suiv ? `<button class="stop" type="button" onclick="${ec.repos ? `pageRepos(${ec.repos.prevu},'${suiv}')` : `ouvrir('${suiv}')`}">Reprendre</button>` : `<button class="stop" type="button" onclick="finSeance('${k}')">Terminer</button>`}</div>`;
-  else h += `<p class="conseil" style="margin:0 16px 12px"><b>Échauffement, 8 min :</b> 5 min de rameur tranquille, 10 grands cercles de bras dans chaque sens, puis 1 série légère du 1er exercice (moitié du poids × 10).</p>`;
+  else h += `<p class="conseil" style="margin:0 16px 12px"><b>Échauffement, 8 min :</b> 5 min de rameur tranquille, 10 grands cercles de bras dans chaque sens, puis ${ECHAUF[s.liste[0]] || '1 série légère du 1er exercice (moitié du poids × 10)'}.</p>`;
   if (LEGERE()) h += `<p class="conseil" style="margin:0 16px 12px">Semaine légère : 2 séries par exercice au lieu de 3, mêmes poids. Ton corps encaisse les 5 semaines d’avant, c’est là que tu grossis.</p>`;
   s.liste.forEach(id => {
     const e = EX[id], n = seriesOk(id), ok = n >= nbSeries(e), prop = propose(id), saute = ec && ec.saute.includes(id);
@@ -825,7 +829,7 @@ function vueProgres() {
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
   recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
   h += `</section></div><p class="vide" style="text-align:left;margin-top:16px">${SYNC ? 'Sauvegarde automatique : chaque série part sur le Mac Mini (copie de chaque jour gardée 3 mois) et une copie part chaque lundi sur GitHub. Tu n’as rien à faire.' : 'Pas encore relié au robot, donc pas de sauvegarde automatique.'}</p><button class="lien-annuler" type="button" onclick="importer()">Nouveau téléphone ? Récupérer une sauvegarde</button>
-    <p class="aide">Version 2.6 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
+    <p class="aide">Version 2.7 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
 function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
