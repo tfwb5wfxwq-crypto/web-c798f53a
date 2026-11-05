@@ -237,7 +237,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 <div class="toast" id="toast" role="status" aria-live="polite"><svg class="ic" viewBox="0 0 24 24" id="toastIc"></svg><div><strong id="toastT"></strong><small id="toastS"></small></div></div>
 
 <script src="agenda.js"></script>
-<script>window.PHOTOS = {rowingbarre:4,rowing1:4,curlbarre:4,marteau:4,tractions:4,pullover:4,oiseau:4,curlincline:4,australiennes:4,rowing2:4,shrugs:4,curl:4,laterales:8};</script>
+<script>window.PHOTOS = {rowingbarre:8,rowing1:8,curlbarre:8,marteau:8,tractions:8,pullover:8,oiseau:8,curlincline:8,australiennes:8,rowing2:8,shrugs:8,curl:8,laterales:8};</script>
 <script>
 // ============ Le programme ============
 // Ludo : 1,84 m, 88 kg, sportif depuis 4 mois (circuit training le matin, 100 pompes par jour), novice en muscu.
@@ -650,7 +650,7 @@ function vueProgres() {
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
   recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
   h += `</section></div><div class="row" style="margin-top:16px"><button class="btn btn-ghost" type="button" onclick="exporter()">Sauvegarder</button><button class="btn btn-ghost" type="button" onclick="importer()">Restaurer</button></div>
-    <p class="aide">Version du 5 nov. 11h45 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
+    <p class="aide">Version du 5 nov. 12h · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
 function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
