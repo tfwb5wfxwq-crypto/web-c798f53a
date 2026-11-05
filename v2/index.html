@@ -116,6 +116,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 .anim img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .anim img+img{animation:flip 2.6s ease-in-out infinite}
 .anim .lab{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.92);border-radius:8px;padding:4px 8px;font-size:12px;font-weight:600;color:var(--t2)}
+.lien-annuler{display:block;margin:12px auto 4px;background:none;border:0;color:var(--t3);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:3px;padding:8px}
 .anim.photos{aspect-ratio:4/5;background:#F7F6F3}
 .anim.photos img{object-fit:contain;opacity:0;animation:none}
 .anim.photos img.on{opacity:1}
@@ -509,8 +510,16 @@ function vueSeance() {
       <div class="txt"><strong>${e.nom}</strong><small class="num">${nbSeries(e)} × ${e.reps[0]}-${e.reps[1]}${e.par ? ' ' + e.par : ''}${prop.kg ? ' · ' + fmt(prop.kg) + ' kg' : ''}${n ? ' · ' + n + '/' + nbSeries(e) : ''}</small></div><span class="state">${ok ? I.check : I.chev}</span></button>`;
   });
   const tout = s.liste.every(id => (log[id] || []).filter(z => z.ok).length >= nbSeries(EX[id]));
-  h += `<div class="fin"><button class="btn ${tout ? 'btn-main' : 'btn-ghost'}" type="button" onclick="terminer('${k}')">${S.faites[k] ? 'Séance validée' : 'Terminer la séance'}</button></div></section>`;
+  h += `<div class="fin"><button class="btn ${tout ? 'btn-main' : 'btn-ghost'}" type="button" onclick="terminer('${k}')">${S.faites[k] ? 'Séance validée' : 'Terminer la séance'}</button></div>`;
+  if (S.faites[k] || s.liste.some(id => (log[id] || []).some(z => z.ok))) h += `<button class="lien-annuler" type="button" onclick="annulerSeance('${k}')">Annuler cette séance (effacer ce qui est noté aujourd’hui)</button>`;
+  h += `</section>`;
   document.getElementById('app').innerHTML = h;
+}
+function annulerSeance(k) {
+  const S = semaine(), log = jourLog();
+  SEANCES[k].liste.forEach(id => { delete log[id]; });
+  if (S.faites[k] === iso(auj)) delete S.faites[k];
+  save(); render(); toast({ ok:true, t:SEANCES[k].nom + ' annulée', s:'Rien n’est compté, tes records et ta progression ne bougent pas.' });
 }
 function jourLog(d) { const k = d || iso(auj); return (D.log[k] = D.log[k] || {}); }
 function terminer(k) {
