@@ -237,7 +237,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 <div class="toast" id="toast" role="status" aria-live="polite"><svg class="ic" viewBox="0 0 24 24" id="toastIc"></svg><div><strong id="toastT"></strong><small id="toastS"></small></div></div>
 
 <script src="agenda.js"></script>
-<script>window.PHOTOS = {rowingbarre:1,rowing1:1,curlbarre:1,marteau:1,tractions:1,pullover:1,oiseau:1,curlincline:1,australiennes:1,rowing2:1,shrugs:1,curl:1};</script>
+<script>window.PHOTOS = {rowingbarre:4,rowing1:4,curlbarre:4,marteau:4,tractions:4,pullover:4,oiseau:4,curlincline:4,australiennes:4,rowing2:4,shrugs:4,curl:4,laterales:8};</script>
 <script>
 // ============ Le programme ============
 // Ludo : 1,84 m, 88 kg, sportif depuis 4 mois (circuit training le matin, 100 pompes par jour), novice en muscu.
@@ -555,7 +555,7 @@ function propose(id) {
 // Photos de Ludo (4 étapes par mouvement) quand elles existent, sinon les dessins d'origine
 const PHOTOS = window.PHOTOS || {};
 const vignette = id => PHOTOS[id] ? 'photos/' + id + '-1.webp' : '../img/' + EX[id].img + '-0.webp';
-const ETAPES_LAB = ['départ', 'en route', 'contracte', 'on redescend'];
+const labEtape = (i, n) => { const f = i / n; return f === 0 ? 'départ' : f < 0.5 ? 'ça monte' : f === 0.5 ? 'contracte' : 'on redescend'; };
 let tAnim = null;
 function animation(id) {
   const e = EX[id]; clearInterval(tAnim);
@@ -563,12 +563,13 @@ function animation(id) {
   setTimeout(() => {
     const box = document.querySelector('.anim.photos'); if (!box) return;
     const imgs = box.querySelectorAll('img'), pts = box.querySelectorAll('.pas i'), lab = box.querySelector('.lab'); let i = 0;
-    const montre = () => { imgs.forEach((x, k) => x.classList.toggle('on', k === i)); pts.forEach((x, k) => x.classList.toggle('on', k === i)); lab.textContent = (i + 1) + ' · ' + ETAPES_LAB[i]; };
+    const montre = () => { imgs.forEach((x, k) => x.classList.toggle('on', k === i)); pts.forEach((x, k) => x.classList.toggle('on', k === i)); lab.textContent = labEtape(i, imgs.length); };
     montre(); if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    tAnim = setInterval(() => { if (!document.body.contains(box)) return clearInterval(tAnim); i = (i + 1) % imgs.length; montre(); }, 900);
+    tAnim = setInterval(() => { if (!document.body.contains(box)) return clearInterval(tAnim); i = (i + 1) % imgs.length; montre(); }, imgs.length > 4 ? 360 : 900);
     box.onclick = () => { clearInterval(tAnim); i = (i + 1) % imgs.length; montre(); };
   }, 0);
-  return `<div class="anim photos">${[1,2,3,4].map(n => `<img src="photos/${id}-${n}.webp" alt="${e.nom}, étape ${n}">`).join('')}<span class="lab"></span><span class="pas"><i></i><i></i><i></i><i></i></span></div>`;
+  const N = PHOTOS[id] === 8 ? 8 : 4, nums = Array.from({ length: N }, (_, i) => i + 1);
+  return `<div class="anim photos">${nums.map(n => `<img src="photos/${id}-${n}.webp" alt="${e.nom}, étape ${n}">`).join('')}<span class="lab"></span><span class="pas">${nums.map(() => '<i></i>').join('')}</span></div>`;
 }
 // La fiche = le cours de l'exercice
 let cur = null;
