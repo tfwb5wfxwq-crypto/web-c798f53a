@@ -170,6 +170,8 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 .r-moy{color:var(--t3);font-size:13px;font-weight:500}
 .lien-annuler{display:block;margin:12px auto 4px;background:none;border:0;color:var(--t3);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:3px;padding:8px}
 .anim.photos{aspect-ratio:4/5;background:#F7F6F3}
+.anim.vid{aspect-ratio:auto;height:min(72vh,calc(100vw * 16 / 9));margin:4px -16px 16px;border:0;border-radius:0;background:transparent}
+.anim.vid video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
 .anim.photos img{object-fit:contain;opacity:0;animation:none}
 .anim.photos img.on{opacity:1}
 .anim .pas{position:absolute;right:10px;bottom:10px;display:flex;gap:4px}
@@ -732,12 +734,12 @@ function propose(id) {
 
 // Photos de Ludo (4 étapes par mouvement) quand elles existent, sinon les dessins d'origine
 const PHOTOS = window.PHOTOS || {};
-const vignette = id => PHOTOS[id] ? 'photos/' + id + '-1.webp' : '../img/' + EX[id].img + '-0.webp';
+const vignette = id => (window.VIDEOS || {})[id] ? 'videos/' + id + '.jpg' : PHOTOS[id] ? 'photos/' + id + '-1.webp' : '../img/' + EX[id].img + '-0.webp';
 const labEtape = (i, n) => { const f = i / n; return f === 0 ? 'départ' : f < 0.5 ? 'ça monte' : f === 0.5 ? 'contracte' : 'on redescend'; };
 let tAnim = null;
 function animation(id) {
   const e = EX[id]; clearInterval(tAnim);
-  if ((window.VIDEOS || {})[id]) return `<div class="anim photos" style="background:#fff"><video src="videos/${id}.mp4" poster="videos/${id}.jpg" autoplay muted loop playsinline disablepictureinpicture aria-label="${e.nom}, mouvement en vidéo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain"></video></div>`;
+  if ((window.VIDEOS || {})[id]) return `<div class="anim vid"><video src="videos/${id}.mp4" poster="videos/${id}.jpg" autoplay muted loop playsinline disablepictureinpicture aria-label="${e.nom}, mouvement en vidéo"></video></div>`;
   if (!PHOTOS[id]) return `<div class="anim"><img src="../img/${e.img}-0.webp" alt="${e.nom}, départ"><img src="../img/${e.img}-1.webp" alt="${e.nom}, arrivée"><span class="lab">départ, puis arrivée</span></div>`;
   setTimeout(() => {
     const box = document.querySelector('.anim.photos'); if (!box) return;
