@@ -200,6 +200,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .field input:focus{border-color:var(--t2);outline:none}
 .r-apercu{margin-top:14px}.r-apercu .anim{margin:8px 0 8px}.r-apercu .anim.vid{height:42vh}.r-prep{font-size:14px;color:var(--t3,#888);margin:0 0 4px}
+.nav-sem{display:flex;justify-content:space-between;padding:8px 16px 0}.nav-sem button{border:0;background:none;font:inherit;font-size:15px;font-weight:500;color:var(--t2,#555);padding:8px 0}
 .g-elas{display:block;margin:10px auto 0;padding:10px 18px;border-radius:999px;border:1px solid var(--line,rgba(0,0,0,.12));background:transparent;font:inherit;font-size:15px;color:var(--t2,#555)}
 .g-elas.on{background:var(--t1,#111);color:#fff;border-color:transparent}
 .field input::placeholder{color:var(--t3);font-weight:500}
@@ -373,7 +374,9 @@ function iso(d) { const x = new Date(d); x.setHours(12, 0, 0, 0); x.setMinutes(x
 const auj = new Date(); auj.setHours(12, 0, 0, 0);
 const jIdx = d => (new Date(d).getDay() + 6) % 7;
 function lundiDe(d) { const x = new Date(d); x.setHours(12, 0, 0, 0); x.setDate(x.getDate() - jIdx(x)); return x; }
-const LUNDI = lundiDe(auj), SEM = iso(LUNDI), AUJ = jIdx(auj);
+let LUNDI = lundiDe(auj), SEM = iso(LUNDI), AUJ = jIdx(auj), OFF = 0;
+// Voir et caler la semaine prochaine : on décale juste le lundi affiché (tous les jours sont alors « à venir »)
+function changerSemaine(o) { OFF = o; LUNDI = lundiDe(auj); LUNDI.setDate(LUNDI.getDate() + 7 * o); SEM = iso(LUNDI); AUJ = o ? -1 : jIdx(auj); render(); scrollTo(0, 0); }
 const dateJ = j => { const x = new Date(LUNDI); x.setDate(LUNDI.getDate() + j); return x; };
 function semaine() {
   if (!D.semaines[SEM]) {   // première ouverture de la semaine : séances calées par défaut, à partir d'aujourd'hui
@@ -429,7 +432,7 @@ function pousser() {
 
 // ============ Navigation ============
 let onglet = 'semaine', seanceVue = null;
-function aller(t) { onglet = t; render(); scrollTo(0, 0); }
+function aller(t) { onglet = t; if (OFF && t !== 'semaine') return changerSemaine(0); render(); scrollTo(0, 0); }
 function render() {
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === onglet));
   ({ semaine: vueSemaine, seance: vueSeance, progres: vueProgres })[onglet]();
@@ -478,7 +481,7 @@ function serie() {   // semaines « actives » d'affilée (au moins 2 séances) 
 function vueSemaine() {
   const S = semaine(), faites = Object.keys(S.faites).length, restantes = ['A','B','C'].filter(k => !S.faites[k]);
   const fin = dateJ(6);
-  let h = `<header class="top"><div><h1>Ma semaine</h1><p>${LUNDI.getDate()} au ${fin.getDate()} ${fin.toLocaleDateString('fr-FR', { month:'long' })}</p></div>
+  let h = `<div class="nav-sem">${OFF ? '<button type="button" onclick="changerSemaine(0)">‹ Cette semaine</button><span></span>' : '<span></span><button type="button" onclick="changerSemaine(1)">Semaine prochaine ›</button>'}</div><header class="top"><div><h1>${OFF ? 'Semaine prochaine' : 'Ma semaine'}</h1><p>${LUNDI.getDate()} au ${fin.getDate()} ${fin.toLocaleDateString('fr-FR', { month:'long' })}</p></div>
     ${serie() ? `<span class="pill num">${I.feu}${serie()} semaine${serie() > 1 ? 's' : ''}</span>` : ''}</header>
     <section class="card jauge"><div class="l1"><strong class="num">${faites} séance${faites > 1 ? 's' : ''} sur 3</strong><small>${(() => { const cal = restantes.filter(k => S.place[k].j != null).length; return !restantes.length ? 'Semaine complète, bravo' : cal === restantes.length ? restantes.length + ' à faire, déjà calée' + (cal > 1 ? 's' : '') : cal + ' calée' + (cal > 1 ? 's' : '') + ' d’ici samedi'; })()}</small></div>
     <div class="barres">${['A','B','C'].map(k => `<span class="${S.faites[k] ? 'fait' : (S.place[k].j != null ? 'cale' : '')}"></span>`).join('')}</div></section><section class="jours">`;
@@ -493,7 +496,7 @@ function vueSemaine() {
   }
   const nonCalees = Object.keys(S.place).filter(k => S.place[k].j == null && !S.faites[k]);
   h += '</section>';
-  if (nonCalees.length) h += `<p class="aide">${nonCalees.map(k => SEANCES[k].nom).join(', ')} : plus de place cette semaine, on reprend lundi.</p>`;
+  if (nonCalees.length) h += `<p class="aide">${nonCalees.map(k => SEANCES[k].nom).join(', ')} : ${OFF ? 'à caler : touche un jour.' : 'plus de place cette semaine, on reprend lundi.'}</p>`;
   h += '<p class="aide">Touche une séance pour changer le jour ou l’heure, ou maintiens-la et glisse-la</p>';
   document.getElementById('app').innerHTML = h;
   brancher();
