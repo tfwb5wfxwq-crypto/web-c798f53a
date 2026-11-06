@@ -199,6 +199,7 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 .field input{width:100%;height:48px;border-radius:10px;background:var(--s1);border:1px solid var(--hair2);padding:0 40px 0 14px;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;-moz-appearance:textfield;caret-color:var(--gant)}
 .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .field input:focus{border-color:var(--t2);outline:none}
+.r-apercu{margin-top:14px}.r-apercu .anim{margin:8px 0 8px}.r-apercu .anim.vid{height:42vh}.r-prep{font-size:14px;color:var(--t3,#888);margin:0 0 4px}
 .g-elas{display:block;margin:10px auto 0;padding:10px 18px;border-radius:999px;border:1px solid var(--line,rgba(0,0,0,.12));background:transparent;font:inherit;font-size:15px;color:var(--t2,#555)}
 .g-elas.on{background:var(--t1,#111);color:#fff;border-color:transparent}
 .field input::placeholder{color:var(--t3);font-weight:500}
@@ -632,13 +633,19 @@ function serieFaite() {
 }
 // Page de repos entre deux séries ou deux exercices : rien ne démarre tant que tu n'appuies pas
 let tRepos = null;
+function apercuPoids(id, e, sets, n) {
+  const z = sets[n - 1] || {}, kg = Number(z.kg) || 0;
+  if (e.poidsCorps) return z.elas ? ' · avec élastique' : kg ? ' · +' + fmt(kg) + ' kg' : '';
+  return kg ? ' · <b>' + fmt(kg) + ' kg</b>' + (e.par ? ' ' + e.par : '') : '';
+}
 function pageRepos(sec, id) {
   const ec = enCours(), s = SEANCES[ec.k], e = EX[id], meme = id === cur, sets = initLog(id), n = sets.findIndex((z, j) => j < nbSeries(e) && !z.ok) + 1;
   try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } catch (x) {}
   document.getElementById('sheetBody').innerHTML = `<div class="g-haut"><button class="iconbtn" type="button" onclick="clearInterval(tRepos);fermer()" aria-label="Réduire">${I.down}</button><span>Repos</span><b class="num" id="chronoMini">${hms(Date.now() - ec.debut)}</b></div>
     <div class="r-centre"><div class="r-temps num" id="rTemps"></div><p class="r-etat" id="rEtat">Souffle, bois une gorgée</p>
     <div class="r-plus"><button type="button" onclick="rAjout(-15)">−15 s</button><button type="button" onclick="rAjout(30)">+30 s</button></div></div>
-    <div class="r-next"><p>${meme ? 'Ensuite' : 'Exercice suivant · ' + (s.liste.indexOf(id) + 1) + ' sur ' + s.liste.length}</p><div class="r-carte"><img src="${vignette(id)}" alt=""><div><strong>${e.nom}</strong><small class="num">Série ${n} sur ${nbSeries(e)} · ${e.reps[0]} à ${e.reps[1]} rép.</small></div></div></div>
+    <div class="r-next"><p>${meme ? 'Ensuite' : 'Exercice suivant · ' + (s.liste.indexOf(id) + 1) + ' sur ' + s.liste.length}</p><div class="r-carte"><img src="${vignette(id)}" alt=""><div><strong>${e.nom}</strong><small class="num">Série ${n} sur ${nbSeries(e)} · ${e.reps[0]} à ${e.reps[1]} rép.${apercuPoids(id, e, sets, n)}</small></div></div>
+    ${meme ? '' : `<div class="r-apercu"><p class="r-prep">Prépare-toi pendant le repos :</p>${animation(id)}<p class="g-faites">${propose(id).txt}</p><details class="g-cours" open><summary>Comment faire</summary><ol>${e.etapes.map((x, j) => `<li><b>${j + 1}</b><span>${x}</span></li>`).join('')}</ol></details></div>`}</div>
     <button class="btn btn-main g-ok" type="button" onclick="clearInterval(tRepos);guide('${id}')">${meme ? 'C’est parti, série ' + n : 'C’est parti'}</button>`;
   const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
   let fini = false; window.rFin = (ec.repos ? ec.repos.debut : Date.now()) + sec * 1000;
