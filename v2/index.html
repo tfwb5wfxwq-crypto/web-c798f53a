@@ -323,7 +323,7 @@ const EX = {
   rowing1:{nom:'Rowing haltère un bras',img:'One-Arm_Dumbbell_Row',series:3,reps:[8,12],repos:90,pas:2,depart:16,muscles:'Grand dorsal',par:'par bras',
     etapes:['Genou et main du même côté sur le banc','Dos plat, parallèle au sol','Tire l’haltère vers la hanche, coude près du corps','10 par bras, puis change de côté'],
     erreurs:['Tourner le buste pour monter','Tirer vers l’épaule au lieu de la hanche'], video:'rowing haltère un bras technique'},
-  curlbarre:{nom:'Curl barre',img:'Barbell_Curl',series:3,reps:[8,10],repos:90,pas:2.5,depart:15,barre:10,alt:'curlsup',muscles:'Biceps',
+  curlbarre:{nom:'Curl barre',img:'Barbell_Curl',series:3,reps:[8,10],repos:90,pas:2.5,depart:10,barre:10,alt:'curlsup',muscles:'Biceps',
     etapes:['Debout, la barre longue (~10 kg à vide), mains largeur d’épaules','Coudes collés aux côtes','Monte la barre jusqu’à la poitrine','Redescends lentement jusqu’en bas'],
     erreurs:['Balancer le dos pour monter','Avancer les coudes en haut'], video:'curl barre biceps technique'},
   marteau:{nom:'Curl marteau',img:'Hammer_Curls',series:3,reps:[10,12],repos:75,pas:2,depart:10,muscles:'Biceps, avant-bras',
@@ -758,7 +758,7 @@ function propose(id) { const p = propose0(id), e = EX[id]; if (e.barre && p.kg) 
 function propose0(id) {
   const e = EX[id], h = historique(id), last = h[h.length - 1];
   const f = (D.force || {})[id];   // poids fixé à la main (retour de Ludo), valable jusqu'à la prochaine fois qu'il fait l'exercice
-  if (f && !h.some(x => x.d > f.d)) return { kg: f.kg, up: true, pq: f.pq, txt: 'Aujourd’hui : ' + fmt(f.kg) + ' kg (' + f.pq + ').' };
+  if (f && !h.some(x => x.d > f.d)) return { kg: f.kg, up: f.up !== false, pq: f.pq, txt: 'Aujourd’hui : ' + fmt(f.kg) + ' kg (' + f.pq + ').' };
   if (!last) return { kg: e.poidsCorps ? 0 : e.depart, test: true, txt: e.poidsCorps ? 'Première fois : fais le maximum propre à chaque série.' : 'Première fois : commence à ' + fmt(e.depart) + ' kg. Si les ' + e.reps[1] + ' répétitions passent facilement, prends plus lourd à la série suivante.' };
   const kg = Math.max(...last.sets.map(s => Number(s.kg) || 0)), top = last.sets.length >= Math.min(2, e.series) && last.sets.every(s => Number(s.reps) >= e.reps[1]);
   if (e.poidsCorps) {
@@ -949,6 +949,9 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && is
 // 09/11 (séance A, à la salle) : rowing barre 20 kg et rowing un bras 15 kg trop faciles → base de la prochaine A, une seule fois, sans toucher au journal
 if (!D.sugg0911) { D.force = Object.assign({}, D.force, { rowingbarre:{ d:'2026-11-09', kg:25, pq:'20 kg trop facile le 9/11' }, rowing1:{ d:'2026-11-09', kg:17, pq:'15 kg trop facile le 9/11' } });
   D.ressenti = D.ressenti || {}; D.ressenti['2026-11-09'] = Object.assign({ rowingbarre:'facile', rowing1:'facile' }, D.ressenti['2026-11-09']); D.sugg0911 = 1; save(); }
+// 09/11 17h15 : curl barre à la barre seule (~10 kg) × 10, « dur, parfait » (avec 2,5 kg par côté c'était trop dur) → on garde 10 kg
+if (!D.sugg0911b) { D.force = Object.assign({}, D.force, { curlbarre:{ d:'2026-11-09', kg:10, up:false, pq:'même poids, barre seule dure mais parfaite le 9/11' } });
+  D.ressenti = D.ressenti || {}; D.ressenti['2026-11-09'] = Object.assign({ curlbarre:'dur' }, D.ressenti['2026-11-09']); D.sugg0911b = 1; save(); }
 recaler();
 render();
 // envoi raté (salle sans réseau) : on renvoie dès que ça revient
