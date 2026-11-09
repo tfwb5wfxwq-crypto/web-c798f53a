@@ -275,6 +275,20 @@ h1{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:38px;line
 .rec span{color:var(--t2);font-size:14px}
 .rec b{font-weight:600;font-variant-numeric:tabular-nums}
 .vide{padding:16px;color:var(--t2)}
+/* Sondage après un exercice */
+.sond-q{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:34px;line-height:1.05;margin:20px 0 4px}
+.sond-r{color:var(--t2);margin-bottom:16px}
+.sondage{display:grid;gap:8px;margin-bottom:8px}
+.sondage button{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 16px;border-radius:14px;border:1px solid var(--hair2);background:var(--s1);text-align:left}
+.sondage button i{width:12px;height:12px;border-radius:50%;flex:none;background:var(--rc)}
+.sondage button b{display:block;font-weight:600;font-size:17px;line-height:1.2}
+.sondage button small{display:block;color:var(--t2);font-size:13px}
+.sondage button.on{background:var(--t1);border-color:var(--t1);color:#fff}
+.sondage button.on small{color:rgba(255,255,255,.7)}
+.sond-fiche{margin:4px 0 14px}.sond-fiche h3{font-size:14px;font-weight:600;color:var(--t2);margin-bottom:8px}
+.mini-sond{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:0 0 10px}
+.mini-sond button{height:36px;border-radius:9px;border:1px solid var(--hair2);background:var(--s1);font-size:13px;font-weight:600;color:var(--t2)}
+.mini-sond button.on{background:var(--t1);border-color:var(--t1);color:#fff}
 </style>
 </head>
 <body>
@@ -303,14 +317,14 @@ window.PHOTOS = {rowingbarre:8,rowing1:8,curlbarre:8,marteau:8,tractions:8,pullo
 // But : compenser les pompes (pecs, triceps) en travaillant le dos, le tirage, les biceps, l'arrière d'épaule.
 // Salle : haltères, barres fixes, banc, barre olympique, barre de traction basse. Pas de poulie.
 const EX = {
-  rowingbarre:{nom:'Rowing barre',img:'Bent_Over_Barbell_Row',series:3,reps:[8,10],repos:150,pas:2.5,depart:30,muscles:'Milieu du dos, grand dorsal',
+  rowingbarre:{nom:'Rowing barre',img:'Bent_Over_Barbell_Row',series:3,reps:[8,10],repos:150,pas:2.5,depart:20,barre:10,alt:'rowing2',muscles:'Milieu du dos, grand dorsal',
     etapes:['Pieds largeur de hanches, genoux un peu fléchis','Penche le buste à 45°, dos bien plat, regard au sol devant toi','Tire la barre vers le bas du ventre en serrant les omoplates','Redescends en 2 secondes jusqu’à bras tendus'],
     erreurs:['Dos rond : baisse le poids tout de suite','Se redresser pour tirer : le buste reste fixe'], video:'rowing barre buste penché technique'},
   rowing1:{nom:'Rowing haltère un bras',img:'One-Arm_Dumbbell_Row',series:3,reps:[8,12],repos:90,pas:2,depart:16,muscles:'Grand dorsal',par:'par bras',
     etapes:['Genou et main du même côté sur le banc','Dos plat, parallèle au sol','Tire l’haltère vers la hanche, coude près du corps','10 par bras, puis change de côté'],
     erreurs:['Tourner le buste pour monter','Tirer vers l’épaule au lieu de la hanche'], video:'rowing haltère un bras technique'},
-  curlbarre:{nom:'Curl barre',img:'Barbell_Curl',series:3,reps:[8,10],repos:90,pas:2.5,depart:20,muscles:'Biceps',
-    etapes:['Debout, une barre fixe du rack, mains largeur d’épaules','Coudes collés aux côtes','Monte la barre jusqu’à la poitrine','Redescends lentement jusqu’en bas'],
+  curlbarre:{nom:'Curl barre',img:'Barbell_Curl',series:3,reps:[8,10],repos:90,pas:2.5,depart:15,barre:10,alt:'curlsup',muscles:'Biceps',
+    etapes:['Debout, la barre longue (~10 kg à vide), mains largeur d’épaules','Coudes collés aux côtes','Monte la barre jusqu’à la poitrine','Redescends lentement jusqu’en bas'],
     erreurs:['Balancer le dos pour monter','Avancer les coudes en haut'], video:'curl barre biceps technique'},
   marteau:{nom:'Curl marteau',img:'Hammer_Curls',series:3,reps:[10,12],repos:75,pas:2,depart:10,muscles:'Biceps, avant-bras',
     etapes:['Un haltère dans chaque main, paumes face à face','Coudes fixes contre le corps','Monte jusqu’à l’épaule','Descends en 2 secondes'],
@@ -340,6 +354,9 @@ const EX = {
   curl:{nom:'Curl haltères',img:'Dumbbell_Bicep_Curl',series:3,reps:[10,12],repos:75,pas:2,depart:10,muscles:'Biceps',
     etapes:['Debout, un haltère par main','Coudes collés au corps','Monte en tournant la paume vers le haut','Descends en 2 secondes'],
     erreurs:['Balancer le dos','Monter les deux à toute vitesse'], video:'curl haltères biceps technique'},
+  curlsup:{nom:'Curl haltères en supination',img:'Dumbbell_Bicep_Curl',media:'curl',series:3,reps:[8,10],repos:90,pas:2,depart:8,par:'par main',muscles:'Biceps (remplace le curl barre)',
+    etapes:['Debout, un haltère par main, paumes vers l’avant dès le départ','Coudes collés aux côtes','Monte les deux haltères ensemble jusqu’aux épaules','Redescends en 2 secondes jusqu’à bras tendus'],
+    erreurs:['Balancer le dos pour monter','Avancer les coudes en haut'], video:'curl haltères supination technique'},
   laterales:{nom:'Élévations latérales',img:'Side_Lateral_Raise',series:3,reps:[12,15],repos:60,pas:1,depart:6,muscles:'Côté des épaules (la largeur)',
     etapes:['Debout, un haltère léger dans chaque main le long du corps','Coudes très légèrement fléchis, buste droit','Monte les bras sur les côtés jusqu’à hauteur d’épaules, pas plus haut','Redescends en 2 secondes, sans laisser tomber'],
     erreurs:['Trop lourd : on balance le buste pour monter','Hausser les épaules vers les oreilles'], video:'élévations latérales haltères technique'},
@@ -349,6 +366,9 @@ const SEANCES = {
   B:{nom:'Séance B',sous:'Tirage vertical et arrière d’épaule',duree:40,c:'var(--B)',liste:['tractions','pullover','oiseau','curlincline']},
   C:{nom:'Séance C',sous:'Mix, épaules et bras',duree:40,c:'var(--C)',liste:['australiennes','rowing2','laterales','shrugs','curl']},
 };
+Object.values(SEANCES).forEach(s => s.base = s.liste.slice());
+// Exercice remplacé (barre trop lourde, prise…) : D.remplace = { curlbarre:'curlsup' }, la progression de l'alternative est suivie à part
+function appliquerRemplacements() { Object.values(SEANCES).forEach(s => s.liste = s.base.map(id => ((typeof D !== 'undefined' && D.remplace) || {})[id] || id)); }
 const BOXE = [0, 1, 2, 4];   // lundi, mardi, mercredi, vendredi (circuit training le matin)
 const DEFAUT = { A:{j:1,h:'18:00'}, B:{j:3,h:'18:00'}, C:{j:5,h:'11:00'} };   // mardi, jeudi, samedi
 const JOURS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], NOMS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
@@ -369,6 +389,7 @@ function numSemaine(lundiIso) { return Math.max(0, Math.round((new Date(lundiIso
 const CLE = 'muscu-ludo-v2';
 let D; try { D = JSON.parse(localStorage.getItem(CLE)) || {}; } catch (e) { D = {}; }
 D.debut = D.debut || iso(new Date()); D.semaines = D.semaines || {}; D.log = D.log || {};
+appliquerRemplacements();
 function save() { try { localStorage.setItem(CLE, JSON.stringify(D)); } catch (e) {} if (typeof pousser === 'function') pousser(); }
 function iso(d) { const x = new Date(d); x.setHours(12, 0, 0, 0); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 10); }
 const auj = new Date(); auj.setHours(12, 0, 0, 0);
@@ -612,11 +633,12 @@ function guide(id) {
     ${fait.length ? `<p class="g-faites num">${fait.map(x => (e.poidsCorps ? (x.elas ? 'élastique × ' : x.kg ? '+' + fmt(x.kg) + ' kg × ' : '') : fmt(x.kg || 0) + ' kg × ') + x.reps).join(' · ')}</p>` : `<p class="g-faites">${prop.txt}</p>`}
     <div class="g-champs"><label class="field"><input id="gKg" type="number" inputmode="decimal" step="0.5" min="0" placeholder="${e.poidsCorps ? '0' : '—'}" value="${z.kg}" aria-label="${e.poidsCorps ? 'Lest en kilos' : 'Kilos'}"><em>${e.poidsCorps ? 'lest' : 'kg'}</em></label>
     <label class="field"><input id="gReps" type="number" inputmode="numeric" min="0" placeholder="${e.reps[1]}" value="${repsProp}" aria-label="Répétitions"><em>rép.</em></label></div>
+    ${e.barre && Number(z.kg) ? `<p class="g-apres" style="margin:-4px 0 12px">${barreTxt(e, z.kg)}</p>` : ''}
     ${e.poidsCorps ? `<button class="btn g-elas${z.elas ? ' on' : ''}" type="button" id="gElas" aria-pressed="${z.elas}" onclick="basculeElas()">${z.elas ? '✓ Avec élastique' : 'Avec élastique ?'}</button>` : ''}
     <button class="btn btn-main g-ok" type="button" onclick="serieFaite()">Série faite</button>
     <p class="g-apres">${n + 1 < tot ? 'Ensuite : repos, puis série ' + (n + 2) : apres ? 'Ensuite : ' + EX[apres].nom : 'Dernière série de la séance'}</p>
     <details class="g-cours"><summary>Comment faire</summary><ol>${e.etapes.map((x, j) => `<li><b>${j + 1}</b><span>${x}</span></li>`).join('')}</ol><ul>${e.erreurs.map(x => `<li>${I.x}<span>${x}</span></li>`).join('')}</ul></details>
-    <button class="lien-annuler" type="button" onclick="sauter('${id}')">Sauter cet exercice (machine prise, douleur…)</button>`;
+    ${boutonRemplacer(id, 'guide')}<button class="lien-annuler" type="button" onclick="sauter('${id}')">Sauter cet exercice (machine prise, douleur…)</button>`;
   document.getElementById('sheetBody').innerHTML = h;
   const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
 }
@@ -628,10 +650,11 @@ function serieFaite() {
   if (e.poidsCorps) sets.forEach((x, j) => { if (j > i && !x.ok) x.elas = z.elas; });   // l'élastique suit aussi
   sets.forEach((x, j) => { if (j > i && !x.ok) x.kg = kg; });   // le poids suit sur les séries d'après
   save(); if (navigator.vibrate) navigator.vibrate(20);
-  const ec = enCours(), reste = suivantDe(ec.k);
-  if (!reste) { document.getElementById('sheet').classList.remove('open'); return finSeance(ec.k); }
+  const ec = enCours(), reste = suivantDe(ec.k), exoFini = seriesOk(cur) >= tot;
+  if (!reste) { if (exoFini) return pageSondage(cur, null); document.getElementById('sheet').classList.remove('open'); return finSeance(ec.k); }
   const prevu = reste === cur ? e.repos : Math.max(e.repos, 120);   // entre deux exercices : 2 min mini, le temps de s'installer
   ec.repos = { ex: cur, i, debut: Date.now(), prevu }; save();
+  if (exoFini) return pageSondage(cur, reste);   // le repos tourne déjà pendant qu'il répond
   pageRepos(prevu, reste);
 }
 // Page de repos entre deux séries ou deux exercices : rien ne démarre tant que tu n'appuies pas
@@ -682,7 +705,8 @@ function voirBilan(k) {
     const avantBest = Math.max(0, ...Object.keys(D.log).filter(d => d < date).flatMap(d => (D.log[d][id] || []).filter(z => z.ok).map(z => e.poidsCorps ? Number(z.reps) : Number(z.kg) || 0)));
     const record = avantBest > 0 && best > avantBest;
     const rr = ok.filter(z => z.repos), rm = rr.length ? rr.reduce((a, z) => a + z.repos, 0) / rr.length : 0;
-    lignes += `<div class="ligne"><span>${e.nom}${record ? ' <b class="up">· record</b>' : ''}${rm ? `<br><small class="r-moy num">repos ${hms(rm * 1000)} en moyenne, prévu ${hms(rr.reduce((a, z) => a + (z.prevu || e.repos), 0) / rr.length * 1000)}</small>` : ''}</span><b>${ok.map(z => (e.poidsCorps ? '' : fmt(z.kg || 0) + ' kg × ') + z.reps).join(' · ')}</b></div>`;
+    const rs = ressenti(date, id);
+    lignes += `<div class="ligne"><span>${e.nom}${record ? ' <b class="up">· record</b>' : ''}${rm ? `<br><small class="r-moy num">repos ${hms(rm * 1000)} en moyenne, prévu ${hms(rr.reduce((a, z) => a + (z.prevu || e.repos), 0) / rr.length * 1000)}</small>` : ''}</span><b>${ok.map(z => (e.poidsCorps ? '' : fmt(z.kg || 0) + ' kg × ') + z.reps).join(' · ')}</b></div><div class="mini-sond" role="group" aria-label="Ressenti ${e.nom}">${RESSENTIS.map(r => `<button type="button" class="${rs === r.k ? 'on' : ''}" aria-pressed="${rs === r.k}" onclick="noterRessenti('${id}','${r.k}','${date}');voirBilan('${k}')">${r.court}</button>`).join('')}</div>`;
   });
   const prochain = SEANCES[k].liste.map(id => { const p = proposeApres(id); return p ? `<div class="ligne"><span>${EX[id].nom}</span><b class="${p.up ? 'up' : ''}">${p.txt}</b></div>` : ''; }).join('');
   const diff = sa && sa.kg ? Math.round((st.kg - sa.kg) / sa.kg * 100) : null;
@@ -691,7 +715,7 @@ function voirBilan(k) {
     <div class="stats"><div class="stat"><b>${b.duree ? hms(b.duree) : '–'}</b><span>durée</span></div><div class="stat"><b>${st.series}</b><span>séries</span></div><div class="stat"><b>${Math.round(st.kg).toLocaleString('fr-FR')}</b><span>kg soulevés</span></div></div>
     ${diff !== null ? `<p class="conseil">${diff >= 0 ? '<span class="up">+' + diff + ' %</span> de charge totale' : diff + ' % de charge totale (séance plus courte ou poids de reprise, c’est normal)'} par rapport à ta dernière ${SEANCES[k].nom} (${new Date(avant + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}).</p>` : '<p class="conseil">Première fois : cette séance devient ta référence.</p>'}
     ${conseilRepos(k, date)}
-    <section class="card bloc"><h3>Ce que tu as fait</h3>${lignes}</section>
+    <section class="card bloc"><h3>Ce que tu as fait · et ton ressenti</h3>${lignes}</section>
     <section class="card bloc"><h3>La prochaine fois</h3>${prochain}</section>
     <button class="btn btn-main" type="button" onclick="fermer()" style="margin-top:16px">Fermer</button></div>`;
   const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
@@ -709,7 +733,7 @@ function proposeApres(id) {   // conseil pour la séance d'après, en comptant c
   if (!h.length) return null;
   const sauve = historique; historique = x => Object.keys(D.log).filter(d => d <= iso(vrai) && D.log[d][x] && D.log[d][x].some(z => z.ok)).sort().map(d => ({ d, sets: D.log[d][x].filter(z => z.ok) }));
   const p = propose(id); historique = sauve; const e = EX[id];
-  return { up: p.up, txt: e.poidsCorps ? (p.up ? 'version plus dure ou + lest' : '1 rép. de plus') : fmt(p.kg) + ' kg' + (p.up ? ', ça monte' : '') };
+  return { up: p.up, txt: e.poidsCorps ? (p.up ? 'version plus dure ou + lest' : '1 rép. de plus') : fmt(p.kg) + ' kg' + (p.pq ? ' · ' + p.pq : p.up ? ', ça monte' : '') };
 }
 function annulerSeance(k) {
   const S = semaine(), log = jourLog();
@@ -730,18 +754,34 @@ function terminer(k) {
 // Progression : double progression. Toutes les séries en haut de la fourchette → la fois d'après, + le pas.
 const fmt = v => String(v).replace('.', ',');
 let historique = function (id) { return Object.keys(D.log).filter(d => d < iso(auj) && D.log[d][id] && D.log[d][id].some(z => z.ok)).sort().map(d => ({ d, sets: D.log[d][id].filter(z => z.ok) })); }
-function propose(id) {
+function propose(id) { const p = propose0(id), e = EX[id]; if (e.barre && p.kg) p.txt += ' ' + barreTxt(e, p.kg) + '.'; return p; }
+function propose0(id) {
   const e = EX[id], h = historique(id), last = h[h.length - 1];
+  const f = (D.force || {})[id];   // poids fixé à la main (retour de Ludo), valable jusqu'à la prochaine fois qu'il fait l'exercice
+  if (f && !h.some(x => x.d > f.d)) return { kg: f.kg, up: true, pq: f.pq, txt: 'Aujourd’hui : ' + fmt(f.kg) + ' kg (' + f.pq + ').' };
   if (!last) return { kg: e.poidsCorps ? 0 : e.depart, test: true, txt: e.poidsCorps ? 'Première fois : fais le maximum propre à chaque série.' : 'Première fois : commence à ' + fmt(e.depart) + ' kg. Si les ' + e.reps[1] + ' répétitions passent facilement, prends plus lourd à la série suivante.' };
   const kg = Math.max(...last.sets.map(s => Number(s.kg) || 0)), top = last.sets.length >= Math.min(2, e.series) && last.sets.every(s => Number(s.reps) >= e.reps[1]);
   if (e.poidsCorps) {
     const lest = kg;
     if (last.sets.some(s => s.elas)) return { kg: 0, txt: top ? 'Toutes tes séries à ' + e.reps[1] + ' avec élastique : prends un élastique plus fin, ou essaie la 1re série sans.' : 'Avec élastique : vise 1 répétition de plus que la dernière fois. Quand tu fais ' + e.series + ' × ' + e.reps[1] + ', on passe à un élastique plus fin.' };
+    const rb = ressenti(last.d, id);
+    if (rb === 'facile' && !top) return { kg: lest, txt: 'C’était trop facile la dernière fois : vise 2 répétitions de plus à chaque série.' };
     if (top) return { kg: lest + 2.5, up: true, txt: 'Toutes tes séries à ' + e.reps[1] + ' : ajoute ' + fmt(lest + 2.5) + ' kg de lest (sac à dos ou haltère entre les pieds), ou passe à la version plus dure.' };
     return { kg: lest, txt: (lest ? 'Toujours ' + fmt(lest) + ' kg de lest. ' : '') + 'Essaie de faire 1 répétition de plus que la dernière fois.' };
   }
   const pauseJ = Math.round((auj - new Date(last.d + 'T12:00')) / 86400000);
   if (pauseJ >= 14 && kg > e.pas) { const f = pauseJ >= 28 ? 0.8 : 0.9, r = Math.max(e.pas, Math.round(kg * f / e.pas) * e.pas); return { kg: r, txt: 'Retour après ' + (pauseJ >= 28 ? Math.round(pauseJ / 7) + ' semaines' : 'deux semaines') + ' : on repart à ' + fmt(r) + ' kg pour réhabituer le corps, tu remonteras vite.' }; }
+  const r1 = ressenti(last.d, id);
+  if (r1) {   // le sondage d'après exercice décide (règle prudente type RPE)
+    const prev = h[h.length - 2], r0 = prev ? ressenti(prev.d, id) : null, kgPrev = prev ? Math.max(...prev.sets.map(s => Number(s.kg) || 0)) : null;
+    const complet = x => x.sets.length >= Math.min(2, e.series) && x.sets.every(s => Number(s.reps) >= e.reps[0]);
+    const monte = (n, pq) => { const plafond = Math.max(e.pas, Math.floor(kg * 0.1 / e.pas) * e.pas), nk = Math.round((kg + Math.min(n * e.pas, plafond)) * 100) / 100; if (n * e.pas > plafond && n > 1) pq += ', limité à un cran pour ne pas te cramer'; return { kg: nk, up: true, pq, txt: 'Aujourd’hui : ' + fmt(nk) + ' kg (+' + fmt(Math.round((nk - kg) * 100) / 100) + ' kg, ' + pq + ').' }; };
+    const garde = pq => ({ kg, pq, txt: 'Aujourd’hui : ' + fmt(kg) + ' kg (même poids, ' + pq + ').' });
+    if (r1 === 'facile') return r0 === 'facile' ? monte(2, 'trop facile 2 fois de suite') : monte(1, 'c’était trop facile la dernière fois');
+    if (r1 === 'bien') { if (top) return monte(1, 'toutes tes séries à ' + e.reps[1] + ' la dernière fois'); if (r0 === 'bien' && kgPrev === kg && complet(last) && complet(prev)) return monte(1, 'bien passé 2 fois de suite'); return garde('tu as forcé sur la fin, on consolide'); }
+    if (r1 === 'dur') return garde('c’était dur la dernière fois, vise les mêmes répétitions');
+    if (r1 === 'rate') { if (r0 === 'rate' && kg > e.pas) { const nk = Math.round((kg - e.pas) * 100) / 100; return { kg: nk, pq: 'raté 2 fois de suite', txt: 'Aujourd’hui : ' + fmt(nk) + ' kg (−' + fmt(e.pas) + ' kg, raté 2 fois de suite : on repart un cran en dessous, bien propre).' }; } return garde('pas toutes les répétitions la dernière fois, on retente'); }
+  }
   if (top) return { kg: kg + e.pas, up: true, txt: 'Toutes tes séries à ' + e.reps[1] + ' la dernière fois : on monte à ' + fmt(kg + e.pas) + ' kg.' };
   // bloqué : 3 séances de suite au même poids sans atteindre le haut, ou la dernière très en dessous → on repart un peu plus léger
   const l3 = h.slice(-3), bloque = l3.length === 3 && l3.every(x => Math.max(...x.sets.map(s => Number(s.kg) || 0)) === kg);
@@ -753,11 +793,11 @@ function propose(id) {
 
 // Photos de Ludo (4 étapes par mouvement) quand elles existent, sinon les dessins d'origine
 const PHOTOS = window.PHOTOS || {};
-const vignette = id => (window.VIDEOS || {})[id] ? 'videos/' + id + '.jpg' : PHOTOS[id] ? 'photos/' + id + '-1.webp' : '../img/' + EX[id].img + '-0.webp';
+const vignette = id0 => { const id = EX[id0].media || id0; return (window.VIDEOS || {})[id] ? 'videos/' + id + '.jpg' : PHOTOS[id] ? 'photos/' + id + '-1.webp' : '../img/' + EX[id].img + '-0.webp'; };
 const labEtape = (i, n) => { const f = i / n; return f === 0 ? 'départ' : f < 0.5 ? 'ça monte' : f === 0.5 ? 'contracte' : 'on redescend'; };
 let tAnim = null;
 function animation(id) {
-  const e = EX[id]; clearInterval(tAnim);
+  const e = EX[id]; clearInterval(tAnim); id = e.media || id;
   if ((window.VIDEOS || {})[id]) return `<div class="anim vid"><video src="videos/${id}.mp4" poster="videos/${id}.jpg" autoplay muted loop playsinline disablepictureinpicture aria-label="${e.nom}, mouvement en vidéo"></video></div>`;
   if (!PHOTOS[id]) return `<div class="anim"><img src="../img/${e.img}-0.webp" alt="${e.nom}, départ"><img src="../img/${e.img}-1.webp" alt="${e.nom}, arrivée"><span class="lab">départ, puis arrivée</span></div>`;
   setTimeout(() => {
@@ -788,7 +828,7 @@ function ouvrir(id) {
   if (e.plusFacile || e.plusDur) h += `<p class="conseil">${e.plusFacile || e.plusDur}</p>`;
   h += `<div class="liens"><a class="lien" href="${yt}" target="_blank" rel="noopener">${I.play}Voir une démo</a><a class="lien" href="https://t.me/LdvkBOT" target="_blank" rel="noopener">${I.cam}Me faire vérifier</a></div>`;
   h += `<p class="conseil">${last ? 'La dernière fois : <b class="num">' + last.sets.map(s => (s.kg ? fmt(s.kg) + ' kg × ' : '') + s.reps).join(' · ') + '</b><br>' : ''}<span class="${prop.up ? 'up' : ''}">${prop.txt}</span></p>`;
-  h += `<div class="sets" id="sets"></div><div class="row"><button class="btn btn-ghost" type="button" onclick="ajoutSerie()">Ajouter une série</button><button class="btn btn-main" type="button" onclick="fermer()">Exercice fini</button></div>${ec ? `<button class="lien-annuler" type="button" onclick="sauter('${id}')">Sauter cet exercice (machine prise, douleur…)</button>` : ''}`;
+  h += `<div class="sets" id="sets"></div><div id="sondFiche"></div>${boutonRemplacer(id, 'ouvrir')}<div class="row"><button class="btn btn-ghost" type="button" onclick="ajoutSerie()">Ajouter une série</button><button class="btn btn-main" type="button" onclick="fermer()">Exercice fini</button></div>${ec ? `<button class="lien-annuler" type="button" onclick="sauter('${id}')">Sauter cet exercice (machine prise, douleur…)</button>` : ''}`;
   document.getElementById('sheetBody').innerHTML = h; renderSets();
   const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
 }
@@ -798,6 +838,47 @@ function renderSets() {
     <label class="field"><input type="number" inputmode="decimal" step="0.5" min="0" placeholder="${e.poidsCorps ? '0' : '—'}" value="${s.kg}" aria-label="Série ${i + 1}, ${e.poidsCorps ? 'lest en kilos' : 'kilos'}" onchange="maj(${i},'kg',this.value)"><em>${e.poidsCorps ? 'lest' : 'kg'}</em></label>
     <label class="field"><input type="number" inputmode="numeric" min="0" placeholder="${e.reps[1]}" value="${s.reps}" aria-label="Série ${i + 1}, répétitions" onchange="maj(${i},'reps',this.value)"><em>rép.</em></label>
     <button type="button" class="check${s.ok ? ' on' : ''}" onclick="valider(${i})" aria-pressed="${s.ok}" aria-label="Série ${i + 1} faite">${I.check}</button></div>`).join('');
+  const box = document.getElementById('sondFiche'); if (!box) return;
+  box.innerHTML = sets.length && sets.every(s => s.ok) ? `<div class="sond-fiche"><h3>Comment c’était ? Je m’en sers pour ton poids de la prochaine fois</h3>${boutonsSondage(cur, `noterRessenti('${cur}','#R#');renderSets()`)}</div>` : '';
+}
+// ============ Ressenti après chaque exercice (comme Freeletics) ============
+const RESSENTIS = [
+  { k:'facile', t:'Trop facile', s:'J’en avais encore plein sous le pied', court:'Facile', c:'#2E8F4B' },
+  { k:'bien', t:'Bien, j’ai forcé sur la fin', s:'Les dernières répétitions piquaient', court:'Bien', c:'#2F6BD0' },
+  { k:'dur', t:'Dur, à la limite', s:'Plus une seule répétition en réserve', court:'Dur', c:'#D98B1F' },
+  { k:'rate', t:'Pas réussi toutes les répétitions', s:'J’ai lâché avant la fin', court:'Raté', c:'#D43A2D' },
+];
+function origineDe(id) { return Object.keys(EX).find(o => EX[o].alt === id) || null; }
+function boutonRemplacer(id, vue) {
+  const o = origineDe(id), alt = EX[id].alt; if (!alt && !o) return '';
+  if ((jourLog()[id] || []).some(z => z.ok)) return '';   // déjà des séries notées : on ne change plus en cours d'exercice
+  return `<button class="btn btn-ghost" type="button" style="margin:0 0 8px" onclick="remplacer('${id}','${vue}')">${alt ? 'Remplacer par : ' + EX[alt].nom : 'Revenir au ' + EX[o].nom}</button>`;
+}
+function remplacer(id, vue) {
+  const o = origineDe(id), nv = EX[id].alt || o; D.remplace = D.remplace || {};
+  if (EX[id].alt) D.remplace[id] = nv; else delete D.remplace[o];
+  const L = jourLog(); if (L[id] && !L[id].some(z => z.ok)) delete L[id];
+  appliquerRemplacements(); save();
+  toast({ ok:true, t:EX[id].alt ? 'Remplacé par ' + EX[nv].nom : 'Retour au ' + EX[nv].nom, s:'Gardé pour les prochaines séances. Ta progression est suivie à part.' });
+  if (vue === 'guide' && enCours()) guide(); else ouvrir(nv);
+}
+function ressenti(d, id) { return ((D.ressenti || {})[d] || {})[id] || null; }
+function noterRessenti(id, r, d) { D.ressenti = D.ressenti || {}; const k = d || iso(auj); (D.ressenti[k] = D.ressenti[k] || {})[id] = r; save(); if (navigator.vibrate) navigator.vibrate(12); }
+function boutonsSondage(id, action, d) { const rs = ressenti(d || iso(auj), id); return `<div class="sondage" role="group" aria-label="Ressenti">${RESSENTIS.map(r => `<button type="button" class="${rs === r.k ? 'on' : ''}" aria-pressed="${rs === r.k}" style="--rc:${r.c}" onclick="${action.replace('#R#', r.k)}"><i></i><span><b>${r.t}</b><small>${r.s}</small></span></button>`).join('')}</div>`; }
+function barreTxt(e, kg) { kg = Number(kg) || 0; const c = Math.round((kg - e.barre) / 2 * 100) / 100; const t = kg <= e.barre ? 'barre longue seule (~' + e.barre + ' kg)' : 'barre longue ~' + e.barre + ' kg + ' + fmt(c) + ' kg de chaque côté'; return e.barreFixe ? 'Barre fixe de ' + fmt(kg) + ' kg, ou ' + t : 'Soit ' + t; }
+function pageSondage(id, reste) {
+  const ec = enCours(), e = EX[id], ok = (jourLog()[id] || []).filter(z => z.ok);
+  document.getElementById('sheetBody').innerHTML = `<div class="g-haut"><button class="iconbtn" type="button" onclick="fermer()" aria-label="Réduire">${I.down}</button><span>${e.nom} terminé</span><b class="num" id="chronoMini">${ec ? hms(Date.now() - ec.debut) : ''}</b></div>
+    <h2 class="sond-q">Comment c’était ?</h2><p class="sond-r num">${ok.map(z => (e.poidsCorps ? (z.elas ? 'élastique × ' : z.kg ? '+' + fmt(z.kg) + ' kg × ' : '') : fmt(z.kg || 0) + ' kg × ') + z.reps).join(' · ')}. Ta réponse règle ton poids de la prochaine fois.</p>
+    ${boutonsSondage(id, `repondre('${id}','#R#',${reste ? `'${reste}'` : 'null'})`)}
+    <button class="lien-annuler" type="button" onclick="repondre('${id}',null,${reste ? `'${reste}'` : 'null'})">Passer</button>`;
+  const sh = document.getElementById('sheet'); sh.scrollTop = 0; sh.classList.add('open');
+}
+function repondre(id, r, reste) {
+  if (r) noterRessenti(id, r); const ec = enCours();
+  if (!ec) return fermer();
+  if (reste && ec.repos) return pageRepos(ec.repos.prevu, reste);
+  document.getElementById('sheet').classList.remove('open'); finSeance(ec.k);
 }
 function maj(i, c, v) { jourLog()[cur][i][c] = v; save(); }
 function valider(i) { const s = jourLog()[cur][i]; if (!s.ok && !s.reps) s.reps = EX[cur].reps[1]; s.ok = !s.ok; save(); renderSets(); if (s.ok) { if (navigator.vibrate) navigator.vibrate(20); repos(EX[cur].repos); } }
@@ -853,7 +934,7 @@ function vueProgres() {
   if (!recs.length) h += '<p class="vide">Tes records s’afficheront ici dès ta première séance.</p>';
   recs.forEach(r => h += `<div class="rec"><div><b>${EX[r.id].nom}</b><br><span>${new Date(r.best.d + 'T12:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</span></div><b class="num">${EX[r.id].poidsCorps ? r.best.reps + ' rép.' + (r.best.kg ? ' + ' + fmt(r.best.kg) + ' kg' : '') : fmt(r.best.v) + ' kg × ' + r.best.reps}</b></div>`);
   h += `</section></div><p class="vide" style="text-align:left;margin-top:16px">${SYNC ? 'Sauvegarde automatique : chaque série part sur le Mac Mini (copie de chaque jour gardée 3 mois) et une copie part chaque lundi sur GitHub. Tu n’as rien à faire.' : 'Pas encore relié au robot, donc pas de sauvegarde automatique.'}</p>
-    <p class="aide">Version 2.9 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
+    <p class="aide">Version 3.0 · ${SYNC ? 'Relié au robot : agenda et copie de secours automatiques.' : 'Pas relié au robot : supprime cette icône et rajoute-la depuis le lien Telegram.'}</p>`;
   document.getElementById('app').innerHTML = h;
 }
 function notePoids(v) { const x = Number(String(v).replace(',', '.')); if (!(x > 40 && x < 160)) return; D.poids = D.poids || {}; D.poids[iso(new Date())] = Math.round(x * 10) / 10; save(); render(); toast({ ok:true, t:'Poids noté', s:fmt(D.poids[iso(new Date())]) + ' kg' }); }
@@ -865,6 +946,9 @@ function toast(v) { const t = document.getElementById('toast'); t.className = 't
 
 // Le téléphone garde l'appli ouverte des jours : au retour, si on a changé de jour, on recharge pour repartir sur la bonne date
 document.addEventListener('visibilitychange', () => { if (!document.hidden && iso(new Date()) !== iso(auj)) location.reload(); });
+// 09/11 (séance A, à la salle) : rowing barre 20 kg et rowing un bras 15 kg trop faciles → base de la prochaine A, une seule fois, sans toucher au journal
+if (!D.sugg0911) { D.force = Object.assign({}, D.force, { rowingbarre:{ d:'2026-11-09', kg:25, pq:'20 kg trop facile le 9/11' }, rowing1:{ d:'2026-11-09', kg:17, pq:'15 kg trop facile le 9/11' } });
+  D.ressenti = D.ressenti || {}; D.ressenti['2026-11-09'] = Object.assign({ rowingbarre:'facile', rowing1:'facile' }, D.ressenti['2026-11-09']); D.sugg0911 = 1; save(); }
 recaler();
 render();
 // envoi raté (salle sans réseau) : on renvoie dès que ça revient
