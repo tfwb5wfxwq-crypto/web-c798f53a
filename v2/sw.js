@@ -1,5 +1,5 @@
 // Hors ligne (salle de sport) : réseau d'abord, sinon la copie gardée. Les photos sont gardées au fil de l'eau.
-const V='muscu-v2-18';
+const V='muscu-v2-19';
 const F=['./','index.html','agenda.js','manifest.webmanifest','../icon-180.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(F)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
