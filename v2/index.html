@@ -610,7 +610,7 @@ function vueSeance() {
   if (LEGERE()) h += `<p class="conseil" style="margin:0 16px 12px">Semaine légère : 2 séries par exercice au lieu de 3, mêmes poids. Ton corps encaisse les 5 semaines d’avant, c’est là que tu grossis.</p>`;
   s.liste.forEach(id => {
     const e = EX[id], n = seriesOk(id), ok = n >= nbSeries(e), prop = propose(id), saute = ec && ec.saute.includes(id);
-    h += `<button type="button" class="ex${ok ? ' done' : ''}${id === suiv ? ' suivant' : ''}${saute ? ' saute' : ''}" onclick="ouvrir('${ec ? (suiv || id) : id}')"><img class="thumb" src="${vignette(id)}" alt="" loading="lazy">
+    h += `<button type="button" class="ex${ok ? ' done' : ''}${id === suiv ? ' suivant' : ''}${saute ? ' saute' : ''}" onclick="${saute || (ec && ok) ? `reprendre('${id}')` : `ouvrir('${ec ? (suiv || id) : id}')`}"><img class="thumb" src="${vignette(id)}" alt="" loading="lazy">
       <div class="txt"><strong>${e.nom}${id === suiv ? '<span class="tag">suivant</span>' : ''}</strong><small class="num">${nbSeries(e)} × ${e.reps[0]}-${e.reps[1]}${e.par ? ' ' + e.par : ''}${prop.kg ? ' · ' + fmt(prop.kg) + ' kg' : ''}${n ? ' · ' + n + '/' + nbSeries(e) : ''}${saute ? ' · sauté' : ''}</small></div><span class="state">${ok ? I.check : I.chev}</span></button>`;
   });
   if (!ec) h += S.faites[k] ? `<div class="fin"><button class="btn btn-ghost" type="button" onclick="voirBilan('${k}')">Revoir le bilan</button></div>` : `<div class="depart"><button class="btn btn-main" type="button" onclick="commencer('${k}')">Commencer la séance</button><p>L’appli te guide : exercice par exercice, série par série, repos compris</p></div>`;
@@ -619,12 +619,19 @@ function vueSeance() {
   document.getElementById('app').innerHTML = h;
 }
 function commencer(k) { D.enCours = { k, date: iso(auj), debut: Date.now(), saute: [] }; save(); render(); const id = suivantDe(k); if (id) ouvrir(id); }
+function reprendre(id) {   // en séance : revenir sur un exercice sauté, ou refaire un exercice déjà validé
+  const ec = enCours(); if (!ec) return ouvrir(id);
+  if (seriesOk(id) >= nbSeries(EX[id])) { if (!confirm('Refaire « ' + EX[id].nom + ' » ? Les séries notées aujourd’hui pour cet exercice seront effacées.')) return; delete jourLog()[id]; }
+  ec.saute = ec.saute.filter(x => x !== id);
+  // on le place en tête : la séance guidée le propose tout de suite
+  ec.prio = id; save(); render(); guide();
+}   // exercice sauté : on peut y revenir en fin de séance
 function sauter(id) { const ec = enCours(); if (ec && !ec.saute.includes(id)) { ec.saute.push(id); save(); } if (ec && suivantDe(ec.k)) guide(); else if (ec) { document.getElementById('sheet').classList.remove('open'); finSeance(ec.k); } else fermer(); }
 // Séance guidée : un exercice, une série à la fois, dans l'ordre du programme
 function guide(id) {
   const ec = enCours(); if (!ec) return ouvrir(id);
   if (ec.repos) { const r = ec.repos, z = (jourLog()[r.ex] || [])[r.i]; if (z) { z.repos = Math.round((Date.now() - r.debut) / 1000); z.prevu = r.prevu; } delete ec.repos; save(); }
-  const k = ec.k, s = SEANCES[k]; id = suivantDe(k); if (!id) { document.getElementById('sheet').classList.remove('open'); return finSeance(k); }
+  const k = ec.k, s = SEANCES[k]; id = (ec.prio && seriesOk(ec.prio) < nbSeries(EX[ec.prio])) ? ec.prio : suivantDe(k); if (ec.prio && id !== ec.prio) { delete ec.prio; save(); } if (!id) { document.getElementById('sheet').classList.remove('open'); return finSeance(k); }
   cur = id; const e = EX[id], sets = initLog(id), tot = nbSeries(e), i = sets.findIndex((z, j) => j < tot && !z.ok), prop = propose(id);
   const n = i < 0 ? tot : i, z = sets[n], fait = sets.filter(x => x.ok), pos = s.liste.indexOf(id) + 1;
   const hh = historique(id), avant = hh.length ? hh[hh.length - 1].sets : [], prec = fait[fait.length - 1];
