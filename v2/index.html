@@ -759,7 +759,7 @@ function terminer(k) {
 const fmt = v => String(v).replace('.', ',');
 let historique = function (id) { return Object.keys(D.log).filter(d => d < iso(auj) && D.log[d][id] && D.log[d][id].some(z => z.ok)).sort().map(d => ({ d, sets: D.log[d][id].filter(z => z.ok) })); }
 // Haltères que Ludo possède (13/11 : pas de 5 ni de 6 kg). Modifiable dans l'appli (« Mes haltères »), gardé dans D.halteres.
-const HALT_DEFAUT = [4, 8, 10, 12, 15, 20, 24, 30, 36];   // lus sur les photos du 13/11
+const HALT_DEFAUT = [2.5, 3.5, 4, 7.5, 8, 10, 12, 15, 20, 24, 30, 36];   // lus sur les photos du 13/11
 const halteres = () => ((typeof D !== 'undefined' && D.halteres) || HALT_DEFAUT).slice().sort((x, y) => x - y);
 function caleHaltere(e, p) {
   if (e.barre || e.poidsCorps || !p.kg) return p;
