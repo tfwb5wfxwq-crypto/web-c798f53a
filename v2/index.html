@@ -345,6 +345,9 @@ const EX = {
   australiennes:{nom:'Tractions australiennes',img:'Inverted_Row',series:3,reps:[8,15],repos:90,pas:0,depart:0,poidsCorps:true,muscles:'Haut du dos, arrière d’épaule',
     etapes:['Sous ta barre basse, mains largeur d’épaules','Corps gainé et droit des talons aux épaules','Tire la poitrine jusqu’à la barre','Redescends bras tendus'],
     erreurs:['Fesses qui tombent : serre les abdos','Tirer avec le cou'], plusDur:'Trop facile ? Mets les pieds sur le banc.', video:'traction australienne inverted row technique'},
+  rowingincline:{nom:'Rowing haltères sur banc incliné',img:'Dumbbell_Incline_Row',series:3,reps:[10,12],repos:90,pas:2,depart:10,par:'par main',muscles:'Haut du dos, arrière d’épaule (remplace les tractions australiennes)',
+    etapes:['Banc incliné à 30-45°, allonge-toi à plat ventre, la poitrine calée en haut du dossier','Un haltère dans chaque main, bras qui pendent, pieds au sol','Tire les deux haltères vers le haut du ventre, coudes un peu écartés du corps','Serre les omoplates 1 seconde en haut, redescends en 2 secondes'],
+    erreurs:['Décoller la poitrine du banc pour s’aider','Hausser les épaules vers les oreilles'], plusDur:'Trop facile ? Monte de 2 kg ou fais 2 secondes de pause en haut.', video:'rowing haltères banc incliné chest supported row technique'},
   rowing2:{nom:'Rowing haltères buste penché',img:'Bent_Over_Two-Dumbbell_Row',series:3,reps:[10,12],repos:120,pas:2,depart:14,muscles:'Milieu du dos',
     etapes:['Un haltère par main, buste penché à 45°','Dos plat, genoux fléchis','Tire les deux haltères vers le nombril','Serre une seconde en haut'],
     erreurs:['Dos rond','Mouvement trop court'], video:'rowing haltères buste penché technique'},
@@ -364,7 +367,7 @@ const EX = {
 const SEANCES = {
   A:{nom:'Séance A',sous:'Tirage horizontal et biceps',duree:40,c:'var(--A)',liste:['rowingbarre','rowing1','curlbarre','marteau']},
   B:{nom:'Séance B',sous:'Tirage vertical et arrière d’épaule',duree:40,c:'var(--B)',liste:['tractions','pullover','oiseau','curlincline']},
-  C:{nom:'Séance C',sous:'Mix, épaules et bras',duree:40,c:'var(--C)',liste:['australiennes','rowing2','laterales','shrugs','curl']},
+  C:{nom:'Séance C',sous:'Mix, épaules et bras',duree:40,c:'var(--C)',liste:['rowingincline','rowing2','laterales','shrugs','curl']},
 };
 Object.values(SEANCES).forEach(s => s.base = s.liste.slice());
 // Exercice remplacé (barre trop lourde, prise…) : D.remplace = { curlbarre:'curlsup' }, la progression de l'alternative est suivie à part
@@ -584,6 +587,7 @@ function brancher() {
 const ECHAUF = {   // dernière étape de l'échauffement, selon le 1er exercice de la séance
   tractions: '30 s suspendu à la barre bras tendus, puis 3 tractions faciles (ou 3 descentes lentes si tu n’y arrives pas encore)',
   australiennes: '1 série de 8 tractions australiennes avec le corps plus droit, pieds plus près (c’est plus facile)',
+  rowingincline: '1 série de 12 rowings sur banc incliné avec des haltères très légers (la moitié de ton poids de travail)',
 };
 const LEGERE = () => estLegere(numSemaine(SEM));
 const nbSeries = e => LEGERE() ? Math.min(2, e.series) : e.series;
