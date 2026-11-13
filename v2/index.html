@@ -758,7 +758,23 @@ function terminer(k) {
 // Progression : double progression. Toutes les séries en haut de la fourchette → la fois d'après, + le pas.
 const fmt = v => String(v).replace('.', ',');
 let historique = function (id) { return Object.keys(D.log).filter(d => d < iso(auj) && D.log[d][id] && D.log[d][id].some(z => z.ok)).sort().map(d => ({ d, sets: D.log[d][id].filter(z => z.ok) })); }
-function propose(id) { const p = propose0(id), e = EX[id]; if (e.barre && p.kg) p.txt += ' ' + barreTxt(e, p.kg) + '.'; return p; }
+// Haltères que Ludo possède (13/11 : pas de 5 ni de 6 kg). Modifiable dans l'appli (« Mes haltères »), gardé dans D.halteres.
+const HALT_DEFAUT = [2, 4, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
+const halteres = () => ((typeof D !== 'undefined' && D.halteres) || HALT_DEFAUT).slice().sort((x, y) => x - y);
+function caleHaltere(e, p) {
+  if (e.barre || e.poidsCorps || !p.kg) return p;
+  const L = halteres(); if (!L.length || L.includes(p.kg)) return p;
+  const sous = L.filter(x => x <= p.kg), dessus = L.filter(x => x >= p.kg);
+  const nk = p.up ? (dessus[0] || sous[sous.length - 1]) : (sous[sous.length - 1] || dessus[0]);
+  p.txt += ' Tu n’as pas de ' + fmt(p.kg) + ' kg : prends ' + fmt(nk) + ' kg' + (nk < p.kg ? ' et fais 2 ou 3 répétitions de plus' : nk > p.kg ? ' et vise le bas de la fourchette' : '') + '.';
+  p.kg = nk; return p;
+}
+function propose(id) { const e = EX[id]; let p = propose0(id); if (e.barre && p.kg) p.txt += ' ' + barreTxt(e, p.kg) + '.'; else p = caleHaltere(e, p); return p; }
+function mesHalteres() {
+  const r = prompt('Tes haltères (en kg, séparés par des virgules) :', halteres().join(', '));
+  if (r === null) return; const L = r.split(/[,; ]+/).map(x => parseFloat(x.replace(',', '.'))).filter(x => x > 0);
+  if (L.length) { D.halteres = [...new Set(L)].sort((x, y) => x - y); save(); location.reload(); }
+}
 function propose0(id) {
   const e = EX[id], h = historique(id), last = h[h.length - 1];
   const f = (D.force || {})[id];   // poids fixé à la main (retour de Ludo), valable jusqu'à la prochaine fois qu'il fait l'exercice
@@ -854,6 +870,10 @@ const RESSENTIS = [
 ];
 function origineDe(id) { return Object.keys(EX).find(o => EX[o].alt === id) || null; }
 function boutonRemplacer(id, vue) {
+  const mh = (!EX[id].barre && !EX[id].poidsCorps) ? `<button class="lien-annuler" type="button" onclick="mesHalteres()">Mes haltères : ${halteres().join(', ')} kg (modifier)</button>` : '';
+  return mh + boutonRemplacer0(id, vue);
+}
+function boutonRemplacer0(id, vue) {
   const o = origineDe(id), alt = EX[id].alt; if (!alt && !o) return '';
   if ((jourLog()[id] || []).some(z => z.ok)) return '';   // déjà des séries notées : on ne change plus en cours d'exercice
   return `<button class="btn btn-ghost" type="button" style="margin:0 0 8px" onclick="remplacer('${id}','${vue}')">${alt ? 'Remplacer par : ' + EX[alt].nom : 'Revenir au ' + EX[o].nom}</button>`;
